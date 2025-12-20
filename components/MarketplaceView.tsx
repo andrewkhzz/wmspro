@@ -262,7 +262,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                     <h4 className="text-[14px] md:text-lg font-bold text-slate-800 line-clamp-2 leading-snug tracking-tight group-hover:text-[#0052FF] transition-colors">{item.title}</h4>
                     {viewMode === 'list' && (
                         <div className="hidden md:flex flex-col items-end">
-                            <span className="text-2xl font-black text-slate-950 tracking-tighter">${item.price.toLocaleString()}</span>
+                            <span className="text-2xl font-medium text-slate-900 tracking-tight">${item.price.toLocaleString()}</span>
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">USD</span>
                         </div>
                     )}
@@ -280,7 +280,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                   )}
 
                   <div className={`flex items-center gap-2 mt-2 ${viewMode === 'list' ? 'hidden md:flex mt-6' : ''}`}>
-                    <span className="text-xl font-black text-slate-950 tracking-tighter">${item.price.toLocaleString()}</span>
+                    <span className="text-2xl font-medium text-slate-900 tracking-tight">${item.price.toLocaleString()}</span>
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">USD</span>
                   </div>
                </div>

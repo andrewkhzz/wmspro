@@ -81,7 +81,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                 {item.title}
               </h1>
               <div className="flex items-end gap-3 pt-4">
-                 <p className="text-5xl font-black text-slate-950 tracking-tighter">${item.price.toLocaleString()}</p>
+                 <p className="text-5xl font-medium text-slate-950 tracking-tight">${item.price.toLocaleString()}</p>
                  <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">USD / Unit</p>
               </div>
            </div>

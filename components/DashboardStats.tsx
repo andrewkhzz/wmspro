@@ -180,7 +180,12 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace }
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Live Asset Stream</h3>
-                   <p className="text-sm font-medium text-slate-400 mt-1">Real-time inventory synchronization from all connected hubs</p>
+                   <div className="flex items-center gap-2 mt-1">
+                      <p className="text-sm font-medium text-slate-400">Real-time inventory synchronization from all connected hubs</p>
+                      <button onClick={() => onNavigateMarketplace?.()} className="text-[10px] font-black text-[#0052FF] uppercase tracking-widest hover:underline flex items-center gap-1 ml-2">
+                         Full Marketplace <ChevronRight size={12} />
+                      </button>
+                   </div>
                 </div>
                 
                 <div className="flex items-center gap-4">
@@ -235,7 +240,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace }
                          <div onClick={() => onNavigateMarketplace?.(item.id)} className="cursor-pointer">
                             <h4 className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">{item.title}</h4>
                             <div className="flex items-center gap-2 mt-3">
-                               <span className="text-xl font-black text-slate-900 tracking-tighter">${item.price.toLocaleString()}</span>
+                               <span className="text-xl font-medium text-slate-900 tracking-tight">${item.price.toLocaleString()}</span>
                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">USD</span>
                             </div>
                          </div>
