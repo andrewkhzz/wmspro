@@ -22,7 +22,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
     <div className="animate-fade-in pb-32">
       <button 
         onClick={onBack}
-        className="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-black text-[10px] uppercase tracking-widest mb-10 transition-all group"
+        className="flex items-center gap-2 text-slate-500 hover:text-[#0052FF] font-black text-[10px] uppercase tracking-widest mb-10 transition-all group"
       >
         <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
         Return to Catalog
@@ -31,21 +31,21 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
         {/* Visual Assets Area */}
         <div className="lg:col-span-7 space-y-8">
-           <div className="relative aspect-square md:aspect-video lg:aspect-square bg-white rounded-[3rem] border border-slate-100 overflow-hidden shadow-2xl group ring-1 ring-slate-100">
+           <div className="relative aspect-square md:aspect-video lg:aspect-square bg-white rounded-[3rem] border border-slate-100 shadow-xl group ring-1 ring-slate-100/30 overflow-hidden">
               <img src={item.image_url} alt={item.title} className="w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-110" />
               <div className="absolute top-8 right-8 flex flex-col gap-4">
                  <button 
                    onClick={() => onToggleFavorite(item.id)}
-                   className="p-4 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl hover:bg-white transition-all active:scale-90"
+                   className="p-4 bg-white/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl hover:bg-white transition-all active:scale-90"
                  >
                    <Heart size={20} fill={isFavorite ? '#EF4444' : 'none'} className={isFavorite ? 'text-red-500' : 'text-slate-900'} />
                  </button>
-                 <button className="p-4 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl hover:bg-white transition-all">
+                 <button className="p-4 bg-white/70 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl hover:bg-white transition-all">
                    <Share2 size={20} className="text-slate-900" />
                  </button>
               </div>
               {item.is_featured && (
-                <div className="absolute bottom-8 left-8 px-6 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-2xl">
+                <div className="absolute bottom-8 left-8 px-6 py-2.5 bg-[#0052FF] text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-2xl">
                    Verified Distribution Node
                 </div>
               )}
@@ -60,7 +60,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                 { label: 'Node', val: 'RU-01', icon: <Globe size={16} /> },
               ].map(spec => (
                 <div key={spec.label} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-3">
-                   <div className="text-blue-600">{spec.icon}</div>
+                   <div className="text-[#0052FF]">{spec.icon}</div>
                    <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{spec.label}</p>
                       <p className="text-xs font-black text-slate-900 uppercase mt-1">{spec.val}</p>
@@ -74,7 +74,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
         <div className="lg:col-span-5 space-y-10">
            <div className="space-y-4">
               <div className="flex items-center gap-2">
-                 <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] bg-blue-50 px-3 py-1 rounded-lg">Industrial Grade</span>
+                 <span className="text-[10px] font-black text-[#0052FF] uppercase tracking-[0.3em] bg-blue-50 px-3 py-1 rounded-lg">Industrial Grade</span>
                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] bg-slate-100 px-3 py-1 rounded-lg">Traceable SKU</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-black text-slate-950 leading-[1.1] tracking-tighter">
@@ -101,7 +101,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
               </div>
 
               <div className="space-y-4 relative z-10">
-                 <button className="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center gap-3">
+                 <button className="w-full py-6 bg-[#0052FF] hover:bg-[#0041CC] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center gap-3">
                     <ShoppingCart size={18} /> Initialize Procurement
                  </button>
                  <button className="w-full py-6 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
@@ -119,7 +119,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
               <div className="flex-1">
                  <div className="flex items-center gap-2">
                     <h4 className="font-black text-slate-900 text-sm">{item.seller_name}</h4>
-                    <ShieldCheck size={14} className="text-blue-600" />
+                    <ShieldCheck size={14} className="text-[#0052FF]" />
                  </div>
                  <div className="flex items-center gap-4 mt-1">
                     <div className="flex items-center gap-1 text-amber-500">
@@ -129,13 +129,13 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verified Seller</span>
                  </div>
               </div>
-              <ArrowUpRight size={20} className="text-slate-300 group-hover:text-blue-600 transition-colors" />
+              <ArrowUpRight size={20} className="text-slate-300 group-hover:text-[#0052FF] transition-colors" />
            </div>
 
            {/* Descriptive Segment */}
            <div className="space-y-4">
               <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-2">
-                 <Info size={16} className="text-blue-500" /> Intelligence Summary
+                 <Info size={16} className="text-[#0052FF]" /> Intelligence Summary
               </h3>
               <p className="text-sm text-slate-500 leading-relaxed font-medium">
                  {item.description || `This high-performance industrial asset (SKU: ${item.inventory_number}) has been verified through the Nexus neural logistics grid. Detailed testing confirms compliance with grade ${item.condition.toUpperCase()} standards. Immediate dispatch available from node RU-01 central warehouse.`}
