@@ -1,26 +1,68 @@
 
-import React from 'react';
-import { LayoutDashboard, Package, Warehouse, Activity, AlertCircle, Settings, Users, Truck, Map, PanelLeft, LogOut, ShoppingBag, Layers, ChevronRight, LogOut as LogoutIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { 
+  LayoutDashboard, 
+  Package, 
+  Warehouse, 
+  Activity, 
+  Settings, 
+  Users, 
+  Truck, 
+  MapPin, 
+  ChevronRight, 
+  ChevronDown,
+  Layers, 
+  Box,
+  ShoppingBag,
+  LogOut as LogoutIcon,
+  Globe,
+  BarChart3,
+  Contact as ContactIcon,
+  Building2
+} from 'lucide-react';
+import { useTranslation, Language } from '../lib/i18n';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   isCollapsed: boolean;
   toggleSidebar: () => void;
+  lang: Language;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar, lang }) => {
+  const [warehouseOpen, setWarehouseOpen] = useState(true);
+  const t = useTranslation(lang);
+
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={1.5} /> },
-    { id: 'marketplace', label: 'Marketplace', icon: <ShoppingBag size={18} strokeWidth={1.5} /> },
-    { id: 'inventory', label: 'Inventory', icon: <Package size={18} strokeWidth={1.5} /> },
-    { id: 'batches', label: 'Batch Hub', icon: <Layers size={18} strokeWidth={1.5} /> },
-    { id: 'locations', label: 'Network', icon: <Map size={18} strokeWidth={1.5} /> },
-    { id: 'warehouses', label: 'Nodes', icon: <Warehouse size={18} strokeWidth={1.5} /> },
-    { id: 'movements', label: 'Movements', icon: <Truck size={18} strokeWidth={1.5} /> },
-    { id: 'moderation', label: 'Compliance', icon: <Activity size={18} strokeWidth={1.5} /> },
-    { id: 'users', label: 'Personnel', icon: <Users size={18} strokeWidth={1.5} /> },
+    { id: 'dashboard', label: t.dashboard, icon: <LayoutDashboard size={18} strokeWidth={1.5} /> },
+    { id: 'marketplace', label: t.marketplace, icon: <ShoppingBag size={18} strokeWidth={1.5} /> },
+    { 
+      id: 'warehouse_group', 
+      label: 'Warehouse', 
+      icon: <Warehouse size={18} strokeWidth={1.5} />,
+      isGroup: true,
+      children: [
+        { id: 'locations', label: t.locations, icon: <Globe size={16} strokeWidth={1.5} /> },
+        { id: 'warehouses', label: 'Zone Control', icon: <Box size={16} strokeWidth={1.5} /> },
+        { id: 'inventory', label: t.inventory, icon: <Package size={16} strokeWidth={1.5} /> },
+        { id: 'batches', label: t.batches, icon: <Layers size={16} strokeWidth={1.5} /> },
+      ]
+    },
+    { id: 'movements', label: t.movements, icon: <Truck size={18} strokeWidth={1.5} /> },
+    { id: 'contacts', label: t.contacts, icon: <Building2 size={18} strokeWidth={1.5} /> },
+    { id: 'reports', label: t.reports, icon: <BarChart3 size={18} strokeWidth={1.5} /> },
+    { id: 'moderation', label: t.moderation, icon: <Activity size={18} strokeWidth={1.5} /> },
+    { id: 'users', label: t.users, icon: <Users size={18} strokeWidth={1.5} /> },
   ];
+
+  const handleTabClick = (id: string, isGroup?: boolean) => {
+    if (isGroup) {
+      if (!isCollapsed) setWarehouseOpen(!warehouseOpen);
+    } else {
+      setActiveTab(id);
+    }
+  };
 
   return (
     <div 
@@ -28,12 +70,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
-      {/* Premium Background Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none"></div>
 
-      {/* Header */}
       <div className="p-6 border-b border-white/5 flex items-center gap-3 min-h-[80px] relative z-10">
-        <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-xl shadow-blue-500/20 shrink-0">
+        <div className="w-10 h-10 bg-[#0052FF] rounded-sm flex items-center justify-center font-black text-xl text-white shadow-xl shadow-blue-500/20 shrink-0">
           N
         </div>
         {!isCollapsed && (
@@ -44,42 +84,66 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
         )}
       </div>
       
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-8 no-scrollbar relative z-10">
         <ul className="space-y-1 px-3">
           {menuItems.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="relative">
               <button
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 relative group ${
-                  activeTab === item.id
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 ring-1 ring-white/10'
+                onClick={() => handleTabClick(item.id, item.isGroup)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-sm transition-all duration-300 relative group ${
+                  activeTab === item.id || (item.children?.some(c => c.id === activeTab))
+                    ? item.isGroup ? 'text-white' : 'bg-[#0052FF] text-white shadow-lg shadow-blue-500/20 ring-1 ring-white/10'
                     : 'text-slate-400 hover:bg-white/5 hover:text-white'
                 } ${isCollapsed ? 'justify-center' : ''}`}
               >
-                {activeTab === item.id && (
-                  <div className="absolute left-0 w-1 h-5 bg-white rounded-full translate-x-1 animate-pulse"></div>
-                )}
-                <div className={`shrink-0 ${activeTab === item.id ? 'text-white' : 'text-slate-500 group-hover:text-blue-400 transition-colors'}`}>
+                <div className={`shrink-0 ${activeTab === item.id || (item.children?.some(c => c.id === activeTab)) ? 'text-white' : 'text-slate-500 group-hover:text-blue-400 transition-colors'}`}>
                     {item.icon}
                 </div>
                 {!isCollapsed && (
-                  <span className="text-xs font-bold tracking-tight transition-all duration-300 truncate">
+                  <span className="text-xs font-bold tracking-tight transition-all duration-300 truncate flex-1 text-left">
                     {item.label}
                   </span>
                 )}
+                {!isCollapsed && item.isGroup && (
+                  warehouseOpen ? <ChevronDown size={14} className="text-slate-500" /> : <ChevronRight size={14} className="text-slate-500" />
+                )}
+                
                 {isCollapsed && (
-                  <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all whitespace-nowrap z-50 shadow-2xl border border-white/10 translate-x-2 group-hover:translate-x-0">
+                  <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-sm opacity-0 group-hover:opacity-100 pointer-events-none transition-all whitespace-nowrap z-50 shadow-2xl border border-white/10 translate-x-2 group-hover:translate-x-0">
                     {item.label}
                   </div>
                 )}
               </button>
+
+              {/* Submenu */}
+              {!isCollapsed && item.children && warehouseOpen && (
+                <ul className="mt-1 ml-4 space-y-1 border-l border-white/5 pl-4 animate-fade-in">
+                  {item.children.map(child => (
+                    <li key={child.id}>
+                      <button
+                        onClick={() => setActiveTab(child.id)}
+                        className={`w-full flex items-center gap-3 px-4 py-2 rounded-sm transition-all duration-300 relative group ${
+                          activeTab === child.id
+                            ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/5'
+                            : 'text-slate-500 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <div className={`shrink-0 ${activeTab === child.id ? 'text-blue-400' : 'text-slate-600 group-hover:text-blue-400 transition-colors'}`}>
+                            {child.icon}
+                        </div>
+                        <span className="text-[11px] font-bold tracking-tight transition-all duration-300 truncate">
+                          {child.label}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
       </nav>
 
-      {/* Collapse Trigger */}
       <button 
         onClick={toggleSidebar}
         className="absolute -right-3 top-24 bg-slate-900 border border-white/10 text-slate-400 rounded-full p-1.5 shadow-xl hover:text-blue-500 hover:border-blue-500/50 transition-all duration-300 z-50 active:scale-90"
@@ -87,23 +151,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
         <ChevronRight size={12} strokeWidth={4} className={`transition-transform duration-500 ${isCollapsed ? '' : 'rotate-180'}`} />
       </button>
 
-      {/* Profile & Settings Footer */}
       <div className="p-4 border-t border-white/5 relative z-10 space-y-2">
-        <div className={`flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}>
+        <div className={`flex items-center gap-3 p-3 bg-white/5 rounded-sm border border-white/5 group hover:bg-white/10 transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}>
           <div className="relative">
-            <img src="https://picsum.photos/id/64/100/100" className="w-8 h-8 rounded-xl shrink-0 grayscale group-hover:grayscale-0 transition-all" />
+            <img src="https://picsum.photos/id/64/100/100" className="w-8 h-8 rounded-sm shrink-0 grayscale group-hover:grayscale-0 transition-all" />
             <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-slate-950"></div>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-black text-white truncate">Alex Manager</p>
-              <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">Enterprise Auth</p>
+              <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{t.auth_tier}</p>
             </div>
           )}
         </div>
         {!isCollapsed && (
-            <button className="w-full flex items-center justify-between p-3 text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest hover:bg-white/5 rounded-xl group">
-                Logout System
+            <button className="w-full flex items-center justify-between p-3 text-slate-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest hover:bg-white/5 rounded-sm group">
+                {t.logout}
                 <LogoutIcon size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
         )}

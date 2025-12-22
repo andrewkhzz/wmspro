@@ -3,15 +3,21 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import { askInventoryAssistant } from '../lib/gemini';
 import { AiChatMessage } from '../lib/types';
+import { Language } from '../lib/i18n';
 
 interface AiAssistantProps {
   isOpen: boolean;
   onClose: () => void;
+  lang?: Language;
 }
 
-const AiAssistant: React.FC<AiAssistantProps> = ({ isOpen, onClose }) => {
+const AiAssistant: React.FC<AiAssistantProps> = ({ isOpen, onClose, lang = 'en' }) => {
+  const initialMessage = lang === 'ru' 
+    ? "Привет! Я Nexus, ваш ИИ-ассистент по складу. Я помогу найти товары, проанализировать запасы или проверить комплаенс. Чем я могу помочь?"
+    : "Hello! I'm Nexus, your AI warehouse assistant. I can help you locate items, analyze stock levels, or check moderation status. How can I help?";
+
   const [messages, setMessages] = useState<AiChatMessage[]>([
-    { role: 'model', text: "Hello! I'm Nexus, your AI warehouse assistant. I can help you locate items, analyze stock levels, or check moderation status. How can I help?", timestamp: new Date() }
+    { role: 'model', text: initialMessage, timestamp: new Date() }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +89,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isOpen, onClose }) => {
              </div>
              <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-none border border-slate-100 shadow-sm flex items-center gap-2">
                 <Loader2 size={16} className="animate-spin text-indigo-500" />
-                <span className="text-xs text-slate-500">Processing inventory data...</span>
+                <span className="text-xs text-slate-500">{lang === 'ru' ? 'Обработка данных...' : 'Processing inventory data...'}</span>
              </div>
            </div>
         )}
@@ -98,7 +104,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isOpen, onClose }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask about stock, locations..." 
+            placeholder={lang === 'ru' ? 'Спросите о запасах, локациях...' : 'Ask about stock, locations...'} 
             className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"
           />
           <button 

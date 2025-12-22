@@ -1,7 +1,63 @@
 
-import { Item, Warehouse, InventoryMovement, Alert, Category, Location, Profile, MarketplaceStory, Batch } from './types';
+import { Item, Warehouse, InventoryMovement, Alert, Category, Location, Profile, MarketplaceStory, Batch, Company } from './types';
 
 export const APP_NAME = "NexusAI WMS";
+
+export const MOCK_COMPANIES: Company[] = [
+  {
+    id: "comp-001",
+    name: "Nexus Logistics Group",
+    tax_id: "RU-123456789",
+    registration_number: "REG-2024-NX",
+    address: "123 Industrial Parkway",
+    city: "Moscow",
+    country: "Russia",
+    website: "https://nexus-logistics.ai",
+    email: "ops@nexus-logistics.ai",
+    phone: "+7 (495) 123-45-67",
+    is_own_company: true,
+    industry: "Logistics & Supply Chain",
+    logo_url: "https://picsum.photos/seed/nexus/200/200"
+  },
+  {
+    id: "comp-002",
+    name: "MegaTools Ltd",
+    tax_id: "DE-987654321",
+    address: "45 Werkstattstrasse",
+    city: "Berlin",
+    country: "Germany",
+    website: "https://megatools.de",
+    email: "sales@megatools.de",
+    phone: "+49 30 123456",
+    is_own_company: false,
+    industry: "Industrial Manufacturing",
+    logo_url: "https://picsum.photos/seed/megatools/200/200",
+    contacts: [
+      {
+        id: "con-001",
+        first_name: "Hans",
+        last_name: "Mueller",
+        email: "h.mueller@megatools.de",
+        phone: "+49 170 5550011",
+        position: "Procurement Manager",
+        company_id: "comp-002"
+      }
+    ]
+  },
+  {
+    id: "comp-003",
+    name: "Global Parts Corp",
+    tax_id: "US-555666777",
+    address: "888 Component Ave",
+    city: "Chicago",
+    country: "USA",
+    email: "info@globalparts.com",
+    phone: "+1 312 555 0199",
+    is_own_company: false,
+    industry: "Distribution",
+    logo_url: "https://picsum.photos/seed/globalparts/200/200"
+  }
+];
 
 export const MOCK_PROFILES: Profile[] = [
   {
@@ -104,7 +160,9 @@ export const MOCK_LOCATIONS: Location[] = [
     is_default: true,
     is_public: false,
     allow_pickup: true,
-    items_count: 1250
+    items_count: 1250,
+    latitude: 55.7558,
+    longitude: 37.6173
   },
   {
     id: "loc-002",
@@ -119,7 +177,65 @@ export const MOCK_LOCATIONS: Location[] = [
     is_default: false,
     is_public: true,
     allow_pickup: true,
-    items_count: 340
+    items_count: 340,
+    latitude: 55.7602,
+    longitude: 37.6114
+  },
+  {
+    id: "loc-003",
+    name: "Satellite Annex",
+    location_code: "SAT03",
+    type: "warehouse",
+    address: "88 Storage Ln",
+    city: "Saint Petersburg",
+    country: "Russia",
+    is_active: true,
+    is_default: false,
+    is_public: false,
+    allow_pickup: false,
+    items_count: 0,
+    latitude: 59.9343,
+    longitude: 30.3351
+  }
+];
+
+export const MOCK_WAREHOUSES: Warehouse[] = [
+  {
+    id: "wh-001",
+    name: "Central Logistics Hub",
+    code: "CLH01",
+    capacity_volume: 50000,
+    location_id: "loc-001",
+    zones: [
+      {
+        id: "zn-001",
+        name: "High Rack A",
+        code: "HRA",
+        zone_type: "rack",
+        bins: [
+          { id: "bn-1", code: "A-01-01", is_occupied: true, current_quantity: 50 },
+          { id: "bn-2", code: "A-01-02", is_occupied: true, current_quantity: 120 },
+          { id: "bn-3", code: "A-01-03", is_occupied: false, current_quantity: 0 },
+        ]
+      },
+      {
+        id: "zn-002",
+        name: "Cold Storage",
+        code: "CS1",
+        zone_type: "cold",
+        bins: [
+            { id: "bn-4", code: "C-01-01", is_occupied: true, current_quantity: 300 },
+        ]
+      }
+    ]
+  },
+  {
+    id: "wh-002",
+    name: "Urban Distribution Center",
+    code: "UDC02",
+    capacity_volume: 15000,
+    location_id: "loc-002",
+    zones: []
   }
 ];
 
@@ -206,11 +322,11 @@ export const MOCK_MOVEMENTS: InventoryMovement[] = [
     item_id: "item-101",
     item_name: "Bosch Professional Drill 18V",
     movement_type: "in",
-    quantity_before: 0,
-    quantity_after: 50,
+    quantity: 50,
     movement_date: new Date().toISOString(),
     user: "Alex Manager",
-    notes: "Initial stock intake"
+    notes: "Initial stock intake",
+    status: 'completed'
   }
 ];
 

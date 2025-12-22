@@ -24,6 +24,18 @@ export function useInventory() {
     setItems(prev => [newItem, ...prev]);
   };
 
+  const updateItem = (id: string, updatedItem: Partial<Item>) => {
+    setItems(prev => prev.map(item => 
+      item.id === id ? { ...item, ...updatedItem } as Item : item
+    ));
+  };
+
+  const deleteItem = (id: string) => {
+    if (confirm('Verify: Permanent asset decommissioning. This action cannot be reversed.')) {
+      setItems(prev => prev.filter(item => item.id !== id));
+    }
+  };
+
   const updateStock = (id: string, amount: number) => {
     setItems(prev => prev.map(item => 
       item.id === id ? { ...item, quantity: item.quantity + amount, available_quantity: item.available_quantity + amount } : item
@@ -37,6 +49,8 @@ export function useInventory() {
     searchTerm,
     setSearchTerm,
     addItem,
+    updateItem,
+    deleteItem,
     updateStock
   };
 }

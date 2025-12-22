@@ -14,6 +14,33 @@ export interface Profile {
   status?: 'active' | 'suspended' | 'pending';
 }
 
+export interface Company {
+  id: string;
+  name: string;
+  tax_id?: string;
+  registration_number?: string;
+  address: string;
+  city: string;
+  country: string;
+  website?: string;
+  email: string;
+  phone: string;
+  is_own_company: boolean;
+  industry?: string;
+  logo_url?: string;
+  contacts?: Contact[];
+}
+
+export interface Contact {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  position: string;
+  company_id: string;
+}
+
 export interface Batch {
   id: string;
   batch_number: string;
@@ -25,6 +52,8 @@ export interface Batch {
   expiry_date: string;
   status: 'active' | 'quarantine' | 'expired';
   location_id: string;
+  zone_id?: string;
+  bin_id?: string;
 }
 
 export interface MarketplaceStory {
@@ -106,6 +135,8 @@ export interface Item {
   status: 'draft' | 'active' | 'sold' | 'archived';
   category_id: number;
   location_id?: string;
+  zone_id?: string;
+  bin_id?: string;
   image_url?: string;
   condition: string;
   requires_moderation: boolean;
@@ -120,12 +151,17 @@ export interface InventoryMovement {
   id: string;
   item_id: string;
   item_name: string;
+  batch_id?: string; // Tighter integration with Batch Inventory
   movement_type: 'in' | 'out' | 'transfer' | 'adjustment';
-  quantity_before: number;
-  quantity_after: number;
+  quantity: number;
+  from_location_id?: string;
+  from_zone_id?: string;
+  to_location_id?: string;
+  to_zone_id?: string;
   movement_date: string;
   user?: string;
   notes?: string;
+  status: 'completed' | 'pending' | 'failed';
 }
 
 export interface Alert {
