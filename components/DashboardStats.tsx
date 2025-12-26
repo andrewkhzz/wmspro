@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { DollarSign, Package, AlertTriangle, Activity, Calendar, Zap, TrendingUp, ShoppingBag, ChevronRight, Globe, LayoutGrid, List, Search, SlidersHorizontal, ArrowUpRight, ShieldCheck, Heart } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -21,12 +22,10 @@ const data = [
 ];
 
 const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, lang = 'en' }) => {
-  // Cast lang to Language to ensure type safety for useTranslation
   const t = useTranslation(lang as Language);
   const { stats, items } = useInventory();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const currentDate = new Date().toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   const filteredLiveItems = items.slice(0, 10).filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -62,7 +61,10 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
                     <button className="bg-blue-600 text-white px-10 py-5 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-500/30 hover:bg-blue-700 transition-all active:scale-95">
                         {t.init_intake}
                     </button>
-                    <button onClick={() => onNavigateMarketplace?.()} className="bg-white/10 backdrop-blur-xl text-white border border-white/20 px-10 py-5 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/20 transition-all flex items-center gap-3">
+                    <button 
+                      onClick={() => onNavigateMarketplace?.()} 
+                      className="bg-white/10 backdrop-blur-xl text-white border border-white/20 px-10 py-5 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/20 transition-all flex items-center gap-3"
+                    >
                         {t.procure_surplus} <ArrowUpRight size={16} />
                     </button>
                 </div>
@@ -71,10 +73,10 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
             <div className="grid grid-cols-2 gap-4 w-full md:w-[480px]">
                 <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-6 rounded-sm hover:bg-white/10 transition-all">
                     <div className="flex justify-between items-start mb-4">
-                        <DollarSign className="text-emerald-400" size={24} />
-                        <TrendingUp className="text-emerald-500" size={14} />
+                        <TrendingUp className="text-emerald-400" size={24} />
+                        <span className="text-xs text-emerald-400 font-bold tracking-widest">RUB</span>
                     </div>
-                    <p className="text-3xl font-black text-white">${(stats.totalValue / 1000).toFixed(1)}k</p>
+                    <p className="text-3xl font-black text-white">₽{(stats.totalValue / 1000).toFixed(0)}k</p>
                     <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mt-1">{t.grid_value}</p>
                 </div>
                 <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-6 rounded-sm hover:bg-white/10 transition-all">
@@ -112,7 +114,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
             <div className="lg:col-span-2 space-y-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.throughput}</h3>
+                        <h3 className="text-2xl font-black text-slate-700 tracking-tight">{t.throughput}</h3>
                         <p className="text-sm font-medium text-slate-400 mt-1">Live visualization of warehouse movement vs capacity</p>
                     </div>
                     <div className="flex bg-slate-100 p-1.5 rounded-sm border border-slate-200">
@@ -125,12 +127,10 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={data}>
                             <defs>
-                                {/* Corrected duplicate x1 attributes to x1, y1 */}
                                 <linearGradient id="colorStock" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>
                                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                                 </linearGradient>
-                                {/* Corrected duplicate x1 attributes to x1, y1 */}
                                 <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
                                     <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
@@ -184,10 +184,13 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
           <div className="space-y-10 max-w-[1800px] mx-auto w-full pt-12 border-t border-slate-100">
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.asset_stream}</h3>
+                   <h3 className="text-2xl font-black text-slate-700 tracking-tight">{t.asset_stream}</h3>
                    <div className="flex items-center gap-2 mt-1">
                       <p className="text-sm font-medium text-slate-400">Real-time inventory synchronization from all connected hubs</p>
-                      <button onClick={() => onNavigateMarketplace?.()} className="text-[10px] font-black text-[#0052FF] uppercase tracking-widest hover:underline flex items-center gap-1 ml-2">
+                      <button 
+                        onClick={() => onNavigateMarketplace?.()} 
+                        className="text-[10px] font-black text-[#0052FF] uppercase tracking-widest hover:underline flex items-center gap-1 ml-2"
+                      >
                          {t.marketplace} <ChevronRight size={12} />
                       </button>
                    </div>
@@ -200,6 +203,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
                         type="text" 
                         placeholder={t.search_placeholder} 
                         value={searchQuery}
+                        // Fix: correctly use setSearchQuery instead of the missing setSearchTerm
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="bg-slate-50 border border-slate-100 rounded-sm py-2.5 pl-11 pr-4 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/5 transition-all w-48 focus:w-72" 
                       />
@@ -243,20 +247,20 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
 
                       <div className={`flex flex-col p-6 flex-1 ${viewMode === 'list' ? 'py-2 justify-between' : ''}`}>
                          <div onClick={() => onNavigateMarketplace?.(item.id)} className="cursor-pointer">
-                            <h4 className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">{item.title}</h4>
+                            <h4 className="font-bold text-slate-700 text-sm group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">{item.title}</h4>
                             <div className="flex items-center gap-2 mt-3">
-                               <span className="text-xl font-medium text-slate-900 tracking-tight">${item.price.toLocaleString()}</span>
-                               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">USD</span>
+                               <span className="text-xl font-medium text-slate-800 tracking-tight">{item.price.toLocaleString()} ₽</span>
+                               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">RUB</span>
                             </div>
                          </div>
                          
                          {viewMode === 'list' && (
-                            <p className="text-xs text-slate-500 leading-relaxed font-medium line-clamp-2 max-w-2xl mt-4">Verified logistics SKU: {item.inventory_number}. Current status marked as {item.status.toUpperCase()}. Central Warehouse confirms full traceability.</p>
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium line-clamp-2 max-w-2xl mt-4">Verified logistics SKU: {item.inventory_number}. Current status marked as {item.status.toUpperCase()}.</p>
                          )}
 
                          <div className={`mt-6 pt-4 border-t border-slate-50 flex items-center justify-between ${viewMode === 'list' ? 'md:border-none md:pt-0 md:mt-0' : ''}`}>
                             <div className="flex items-center gap-2">
-                               <span className={`w-2 h-2 rounded-full ${item.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+                               <span className={`w-2 h-2 rounded-full ${item.status === 'active' ? 'bg-emerald-50' : 'bg-amber-50'}`}></span>
                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.status}</span>
                             </div>
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Stock: {item.available_quantity}</span>
@@ -265,7 +269,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ onNavigateMarketplace, 
 
                       {viewMode === 'list' && (
                          <div className="flex items-center px-4">
-                            <button onClick={() => onNavigateMarketplace?.(item.id)} className="px-8 py-3 bg-slate-900 text-white rounded-sm text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all">
+                            <button onClick={() => onNavigateMarketplace?.(item.id)} className="px-8 py-3 bg-slate-800 text-white rounded-sm text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all">
                                {t.manage_sku}
                             </button>
                          </div>

@@ -18,9 +18,13 @@ import {
   Globe,
   BarChart3,
   Contact as ContactIcon,
-  Building2
+  Building2,
+  User as UserIcon,
+  Tag
 } from 'lucide-react';
 import { useTranslation, Language } from '../lib/i18n';
+// Import MOCK_PROFILES from constants to fix missing name error
+import { MOCK_PROFILES } from '../lib/constants';
 
 interface SidebarProps {
   activeTab: string;
@@ -47,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
         { id: 'warehouses', label: 'Zone Control', icon: <Box size={16} strokeWidth={1.5} /> },
         { id: 'inventory', label: t.inventory, icon: <Package size={16} strokeWidth={1.5} /> },
         { id: 'batches', label: t.batches, icon: <Layers size={16} strokeWidth={1.5} /> },
+        { id: 'categories', label: 'Categories', icon: <Tag size={16} strokeWidth={1.5} /> },
       ]
     },
     { id: 'movements', label: t.movements, icon: <Truck size={18} strokeWidth={1.5} /> },
@@ -54,6 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
     { id: 'reports', label: t.reports, icon: <BarChart3 size={18} strokeWidth={1.5} /> },
     { id: 'moderation', label: t.moderation, icon: <Activity size={18} strokeWidth={1.5} /> },
     { id: 'users', label: t.users, icon: <Users size={18} strokeWidth={1.5} /> },
+    { id: 'account', label: t.account || 'Account', icon: <UserIcon size={18} strokeWidth={1.5} /> },
   ];
 
   const handleTabClick = (id: string, isGroup?: boolean) => {
@@ -152,14 +158,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
       </button>
 
       <div className="p-4 border-t border-white/5 relative z-10 space-y-2">
-        <div className={`flex items-center gap-3 p-3 bg-white/5 rounded-sm border border-white/5 group hover:bg-white/10 transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}>
+        <div 
+          onClick={() => setActiveTab('account')}
+          className={`flex items-center gap-3 p-3 bg-white/5 rounded-sm border border-white/5 group hover:bg-white/10 transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''} ${activeTab === 'account' ? 'ring-1 ring-blue-500 bg-blue-500/10' : ''}`}
+        >
           <div className="relative">
-            <img src="https://picsum.photos/id/64/100/100" className="w-8 h-8 rounded-sm shrink-0 grayscale group-hover:grayscale-0 transition-all" />
+            <img src={MOCK_PROFILES[0].avatar_url} className="w-8 h-8 rounded-sm shrink-0 grayscale group-hover:grayscale-0 transition-all" />
             <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-slate-950"></div>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-black text-white truncate">Alex Manager</p>
+              <p className="text-[11px] font-black text-white truncate">{MOCK_PROFILES[0].full_name}</p>
               <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{t.auth_tier}</p>
             </div>
           )}

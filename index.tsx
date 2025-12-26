@@ -13,12 +13,16 @@ import MovementsView from './components/MovementsView';
 import ReportsView from './components/ReportsView';
 import AddItemModal from './components/AddItemModal';
 import FullMarketplacePage from './components/FullMarketplacePage';
-import UsersView from './components/UsersView';
+import PersonnelManagerView from './components/PersonnelManagerView';
 import ContactsView from './components/ContactsView';
+import AccountView from './components/AccountView';
+import AuthPages from './components/AuthPages';
+import CategoryManagerView from './components/CategoryManagerView';
 import { Item } from './lib/types';
 import { Language } from './lib/i18n';
 
 const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
@@ -29,6 +33,20 @@ const App = () => {
   
   // For deep-linking into specific warehouse locations
   const [selectedWarehouseLocation, setSelectedWarehouseLocation] = useState<string | null>(null);
+
+  const handleLogin = (role: string, tier: string) => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setIsFullPage(false);
+    setActiveTab('dashboard');
+  };
+
+  if (!isAuthenticated) {
+    return <AuthPages onLogin={handleLogin} />;
+  }
 
   if (isFullPage) {
     return <FullMarketplacePage onExit={() => setIsFullPage(false)} />;
@@ -71,7 +89,11 @@ const App = () => {
       case 'reports':
         return <ReportsView />;
       case 'users':
-        return <UsersView />;
+        return <PersonnelManagerView lang={lang} />;
+      case 'account':
+        return <AccountView lang={lang} />;
+      case 'categories':
+        return <CategoryManagerView />;
       default: 
         return <DashboardPage onNavigateMarketplace={handleNavigateToMarketplace} lang={lang} />;
     }
@@ -87,6 +109,8 @@ const App = () => {
       setIsAiOpen={setIsAiOpen}
       lang={lang}
       setLang={setLang}
+      onLaunchMarketplace={handleNavigateToMarketplace}
+      onLogout={handleLogout}
     >
       {renderContent()}
       {isAddItemOpen && (

@@ -1,139 +1,148 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { MOCK_ITEMS, MOCK_ALERTS, MOCK_LOCATIONS, MOCK_WAREHOUSES, MOCK_MOVEMENTS } from './constants';
+import { MOCK_ITEMS, MOCK_ALERTS, MOCK_LOCATIONS, MOCK_WAREHOUSES, MOCK_MOVEMENTS, MOCK_CATEGORIES } from './constants';
 
 export const askInventoryAssistant = async (question: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
   try {
-    const context = `
-      You are NexusAI, an advanced Warehouse Intelligence System.
-      
-      Current State:
-      - Active Locations: ${MOCK_LOCATIONS.length}
-      - Managed SKUs: ${MOCK_ITEMS.length}
-      - System Alerts: ${MOCK_ALERTS.length}
-      - Warehouses: ${MOCK_WAREHOUSES.length}
-
-      Inventory Samples:
-      ${MOCK_ITEMS.slice(0, 5).map(i => `${i.title} (${i.available_quantity} available, price $${i.price})`).join('\n')}
-
-      Mission: Provide concise, professional intelligence reports or inventory findings to the manager.
-    `;
-
+    const context = `You are NexusAI, an advanced Warehouse Intelligence System. MISSION: Provide concise reports.`;
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: question,
-      config: { 
-        systemInstruction: context,
-        temperature: 0.2,
-      }
+      config: { systemInstruction: context, temperature: 0.2 }
     });
-
     return response.text || "No intelligence generated.";
   } catch (error) {
-    console.error("Gemini Failure:", error);
     return "Intelligence failure. Please retry.";
   }
 };
 
-export const generateReportInsight = async (reportType: string) => {
+export const enhanceStory = async (rawText: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-  const dataContext = {
-    itemsCount: MOCK_ITEMS.length,
-    totalValue: MOCK_ITEMS.reduce((acc, i) => acc + (i.price * i.available_quantity), 0),
-    movementsCount: MOCK_MOVEMENTS.length,
-    locationsCount: MOCK_LOCATIONS.length,
-  };
-
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Generate a brief, 2-sentence executive insight for a ${reportType} report based on these metrics: ${JSON.stringify(dataContext)}. 
-               Focus on efficiency, risk, and optimization. Professional tone.`,
-    config: {
-      temperature: 0.4
-    }
+    contents: `Transform this raw technical warehouse feedback into a professional, inspiring industrial success story. RAW: "${rawText}". Return JSON: { "title": string, "content": string, "suggested_tags": string[] }`,
+    config: { responseMimeType: "application/json" }
   });
+  return JSON.parse(response.text || "{}");
+};
 
-  return response.text || "Analysis pending system synchronization.";
+export const generateStoryArt = async (content: string): Promise<string | null> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts: [{ text: `A high-tech cinematic industrial digital art representing: "${content.slice(0, 100)}". Blueprint aesthetics, neon blue accents, ultra-modern logistics.` }] },
+      config: { imageConfig: { aspectRatio: "16:9", imageSize: "1K" } }
+    });
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+    }
+    return null;
+  } catch { return null; }
+};
+
+export const suggestSmartReply = async (lastMessage: string, context: string) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-flash-preview',
+    contents: `Based on this conversation context: "${context}", suggest 3 professional quick replies to: "${lastMessage}". Return ONLY a JSON array of strings.`,
+    config: { responseMimeType: "application/json" }
+  });
+  try {
+    return JSON.parse(response.text || "[]");
+  } catch {
+    return ["Understood.", "Checking stock now.", "Will confirm soon."];
+  }
+};
+
+export const summarizeChat = async (messages: any[]) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const transcript = messages.map(m => `${m.sender_name}: ${m.text}`).join('\n');
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-flash-preview',
+    contents: `Summarize this industrial conversation into 3 key bullet points:\n${transcript}`,
+  });
+  return response.text || "Summary unavailable.";
+};
+
+export const generateReportInsight = async (reportType: string) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const dataContext = { itemsCount: MOCK_ITEMS.length, movementsCount: MOCK_MOVEMENTS.length };
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-flash-preview',
+    contents: `Generate a 2-sentence executive insight for ${reportType}. Context: ${JSON.stringify(dataContext)}`,
+  });
+  return response.text || "Analysis pending.";
 };
 
 export const suggestBinAllocation = async (itemType: string, warehouseCode: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const warehouse = MOCK_WAREHOUSES.find(w => w.code === warehouseCode);
-  
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Suggest the best storage zone and bin for a new shipment of ${itemType} in warehouse ${warehouse?.name}.
-               Current Zones: ${JSON.stringify(warehouse?.zones?.map(z => ({ name: z.name, type: z.zone_type, code: z.code })))}.
-               Return JSON: { suggestedZoneCode: string, reason: string, priority: 'high' | 'medium' | 'low' }`,
+    contents: `Suggest storage zone for ${itemType} in warehouse ${warehouseCode}. Return JSON: { suggestedZoneCode: string, reason: string }`,
     config: { responseMimeType: "application/json" }
   });
-
-  try {
-    return JSON.parse(response.text || "{}");
-  } catch (e) {
-    return { suggestedZoneCode: warehouse?.zones?.[0]?.code || 'N/A', reason: "Standard allocation protocol.", priority: 'medium' };
-  }
+  return JSON.parse(response.text || "{}");
 };
 
 export const autoIdentifyItem = async (base64Image: string, includeCharacteristics: boolean = true) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-  const characteristicPrompt = includeCharacteristics 
-    ? "Suggest 3-5 technical characteristics specific to this item type (e.g., 'Voltage', 'Weight', 'Dimensions', 'Material')."
-    : "Do not suggest any characteristics.";
-
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: {
       parts: [
         { inlineData: { mimeType: 'image/jpeg', data: base64Image } },
-        { text: `Act as an expert industrial inventory inspector. Analyze this image for SKU registration.
-                 Return ONLY a JSON object with:
-                 - title: A professional, descriptive product name.
-                 - category: Most likely warehouse category (e.g., Electronics, Industrial Parts, Tools).
-                 - suggested_price: A number representing realistic market value in USD.
-                 - condition: Choose one: 'new', 'used_good', 'used_fair', 'damaged'.
-                 - description: A detailed, technical, 2-3 sentence description.
-                 - characteristics: ${includeCharacteristics ? 'An array of { "label": string, "value": string } objects.' : 'An empty array.'}
-                 
-                 ${characteristicPrompt}` 
-        }
+        { text: `Identify item. Return JSON: { title, category_id, suggested_price, condition, description, characteristics, suggested_sku }` }
       ]
     },
-    config: { 
-      responseMimeType: "application/json" 
-    }
+    config: { responseMimeType: "application/json" }
   });
-  
-  const text = response.text || "{}";
+  return JSON.parse(response.text || "{}");
+};
+
+export const suggestCategoryOptimization = async (categories: any[]) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-flash-preview',
+    contents: `Analyze categories: ${JSON.stringify(categories)}. Return JSON: { suggestions: string[], optimization_score: number }`,
+    config: { responseMimeType: "application/json" }
+  });
+  return JSON.parse(response.text || "{}");
+};
+
+export const generateCategoryVisual = async (categoryName: string): Promise<string | null> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
-    const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanJson);
-  } catch (e) {
-    console.error("Failed to parse JSON from Gemini:", text);
-    return {};
-  }
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts: [{ text: `High-tech industrial flat icon for "${categoryName}" category.` }] },
+      config: { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }
+    });
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+    }
+    return null;
+  } catch { return null; }
+};
+
+export const generateAiSku = async (title: string, category: string, characteristics: any[]) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-flash-preview',
+    contents: `Generate industrial SKU for ${title}. Return JSON: { "sku": string }`,
+    config: { responseMimeType: "application/json" }
+  });
+  try { return JSON.parse(response.text || "{}").sku; } 
+  catch { return `SKU-${Date.now().toString().slice(-6)}`; }
 };
 
 export const analyzeMovementRisk = async (itemName: string, fromZone: string, toZone: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Evaluate the risk of moving item "${itemName}" from "${fromZone}" to "${toZone}".
-               Consider potential hazards, temperature requirements, and efficiency.
-               Return JSON: { riskScore: number (0-100), riskLevel: 'low' | 'medium' | 'high', reason: string, suggestion: string }`,
+    contents: `Risk of moving ${itemName}. Return JSON: { riskScore, riskLevel, reason, suggestion }`,
     config: { responseMimeType: "application/json" }
   });
-
-  try {
-    const text = response.text || "{}";
-    const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanJson);
-  } catch (e) {
-    return { riskScore: 0, riskLevel: 'low', reason: "Validation complete.", suggestion: "Proceed with caution." };
-  }
+  return JSON.parse(response.text || "{}");
 };

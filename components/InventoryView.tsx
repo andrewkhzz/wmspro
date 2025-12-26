@@ -1,17 +1,24 @@
 
-import React, { useState } from 'react';
-import { Search, Plus, Filter, MoreVertical, Edit2, Trash2, MapPin, Layers, Box, ChevronDown, CheckCircle, AlertOctagon, ArrowUpDown, Tag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Plus, Filter, Edit2, Trash2, MapPin, Layers, Box } from 'lucide-react';
 import { MOCK_LOCATIONS, MOCK_WAREHOUSES } from '../lib/constants';
 import { useInventory } from '../hooks/use-inventory';
 import { Item } from '../lib/types';
 
 interface InventoryViewProps {
   onAddItem: (item?: Item) => void;
+  searchOverride?: string;
 }
 
-const InventoryView: React.FC<InventoryViewProps> = ({ onAddItem }) => {
+const InventoryView: React.FC<InventoryViewProps> = ({ onAddItem, searchOverride = '' }) => {
   const { items, stats, searchTerm, setSearchTerm, deleteItem } = useInventory();
-  const [sortBy, setSortBy] = useState<'title' | 'price' | 'stock'>('title');
+
+  // Sync internal search with global search if override is provided
+  useEffect(() => {
+    if (searchOverride !== undefined) {
+      setSearchTerm(searchOverride);
+    }
+  }, [searchOverride, setSearchTerm]);
 
   const getLocationName = (id?: string) => MOCK_LOCATIONS.find(l => l.id === id)?.name || 'Unassigned';
   
@@ -29,7 +36,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ onAddItem }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-sm border border-slate-100 shadow-sm">
            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Global Valuation</p>
-           <h3 className="text-2xl font-black text-slate-950">${(stats.totalValue / 1000).toFixed(1)}k</h3>
+           <h3 className="text-2xl font-black text-slate-950">₽{(stats.totalValue / 1000).toFixed(1)}k</h3>
         </div>
         <div className="bg-white p-6 rounded-sm border border-slate-100 shadow-sm">
            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Catalog Count</p>
@@ -130,7 +137,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ onAddItem }) => {
                     </div>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <p className="text-sm font-black text-slate-900 tracking-tighter">${item.price.toLocaleString()}</p>
+                    <p className="text-sm font-black text-slate-900 tracking-tighter">{item.price.toLocaleString()} ₽</p>
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Price / Unit</p>
                   </td>
                   <td className="px-8 py-6 text-right">

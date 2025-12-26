@@ -1,6 +1,14 @@
 
 export type SubscriptionTier = 'free' | 'pro' | 'enterprise';
 export type UserRole = 'admin' | 'manager' | 'staff' | 'seller' | 'buyer';
+export type SellerType = 'individual' | 'enterprise';
+
+export interface SellerMetrics {
+  reliability: number;
+  delivery_speed: number;
+  integrity_score: number;
+  verification_date: string;
+}
 
 export interface Profile {
   id: string;
@@ -12,48 +20,40 @@ export interface Profile {
   email?: string;
   last_active?: string;
   status?: 'active' | 'suspended' | 'pending';
+  hourly_rate?: number; 
+  department?: string;
 }
 
-export interface Company {
+export interface ChatMessage {
   id: string;
-  name: string;
-  tax_id?: string;
-  registration_number?: string;
-  address: string;
-  city: string;
-  country: string;
-  website?: string;
-  email: string;
-  phone: string;
-  is_own_company: boolean;
-  industry?: string;
-  logo_url?: string;
-  contacts?: Contact[];
+  conversation_id: string;
+  sender_id: string;
+  sender_name: string;
+  sender_avatar?: string;
+  text: string;
+  timestamp: string;
+  status: 'sent' | 'delivered' | 'read';
+  ai_enhanced?: boolean;
 }
 
-export interface Contact {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  position: string;
-  company_id: string;
+// Added AiChatMessage for AI Assistant functionality
+export interface AiChatMessage {
+  role: 'user' | 'model';
+  text: string;
+  timestamp: Date;
+  isThinking?: boolean;
 }
 
-export interface Batch {
+export interface Conversation {
   id: string;
-  batch_number: string;
-  item_id: string;
-  item_name: string;
-  initial_quantity: number;
-  current_quantity: number;
-  production_date: string;
-  expiry_date: string;
-  status: 'active' | 'quarantine' | 'expired';
-  location_id: string;
-  zone_id?: string;
-  bin_id?: string;
+  type: 'marketplace' | 'support';
+  participants: Profile[];
+  last_message?: string;
+  last_message_time: string;
+  unread_count: number;
+  subject?: string; // e.g., "Re: Bosch Drill 18V"
+  context_id?: string; // e.g., itemId or orderId
+  sentiment?: 'positive' | 'neutral' | 'negative';
 }
 
 export interface MarketplaceStory {
@@ -62,9 +62,13 @@ export interface MarketplaceStory {
   full_name: string;
   company: string;
   avatar_url: string;
+  title: string; // descriptive title
   content: string;
+  cover_image?: string; // AI generated cover
   tags: string[];
   date: string;
+  status: 'draft' | 'published'; // management status
+  views: number; // engagement tracking
 }
 
 export interface Category {
@@ -72,6 +76,43 @@ export interface Category {
   name: string;
   slug: string;
   items_count: number;
+  parent_id?: number;
+  description?: string;
+  icon_name?: string;
+  custom_icon_url?: string;
+  color_code?: string;
+  metadata?: {
+    is_hazardous?: boolean;
+    requires_special_handling?: boolean;
+    storage_temp_min?: number;
+    storage_temp_max?: number;
+  };
+}
+
+// Added storage components for warehouse management
+export interface StorageBin {
+  id: string;
+  code: string;
+  is_occupied: boolean;
+  current_quantity: number;
+  max_volume?: number;
+}
+
+export interface StorageZone {
+  id: string;
+  name: string;
+  code: string;
+  zone_type: 'bulk' | 'rack' | 'shelf' | 'bin' | 'cold' | 'hazardous';
+  bins?: StorageBin[];
+}
+
+export interface Warehouse {
+  id: string;
+  name: string;
+  code: string;
+  capacity_volume: number;
+  location_id: string;
+  zones?: StorageZone[];
 }
 
 export interface Location {
@@ -99,31 +140,6 @@ export interface Location {
   created_at?: string;
 }
 
-export interface Warehouse {
-  id: string;
-  name: string;
-  code: string;
-  capacity_volume: number;
-  location_id: string;
-  zones?: StorageZone[];
-}
-
-export interface StorageZone {
-  id: string;
-  name: string;
-  code: string;
-  zone_type: 'bulk' | 'rack' | 'shelf' | 'bin' | 'cold' | 'hazardous';
-  bins?: StorageBin[];
-}
-
-export interface StorageBin {
-  id: string;
-  code: string;
-  is_occupied: boolean;
-  current_quantity: number;
-  max_volume?: number;
-}
-
 export interface Item {
   id: string;
   title: string;
@@ -143,17 +159,21 @@ export interface Item {
   is_featured?: boolean;
   seller_name?: string;
   seller_rating?: number;
+  seller_type?: SellerType;
+  seller_metrics?: SellerMetrics;
   description?: string;
   tags?: string[];
 }
 
+// Added InventoryMovement for tracking asset migrations
+/* Fix: Added batch_id to InventoryMovement interface */
 export interface InventoryMovement {
   id: string;
   item_id: string;
   item_name: string;
-  batch_id?: string; // Tighter integration with Batch Inventory
   movement_type: 'in' | 'out' | 'transfer' | 'adjustment';
   quantity: number;
+  batch_id?: string;
   from_location_id?: string;
   from_zone_id?: string;
   to_location_id?: string;
@@ -161,9 +181,10 @@ export interface InventoryMovement {
   movement_date: string;
   user?: string;
   notes?: string;
-  status: 'completed' | 'pending' | 'failed';
+  status?: 'completed' | 'pending';
 }
 
+// Added Alert interface
 export interface Alert {
   id: string;
   type: 'low_stock' | 'moderation' | 'expiration' | 'system';
@@ -172,9 +193,71 @@ export interface Alert {
   date: string;
 }
 
-export interface AiChatMessage {
-  role: 'user' | 'model';
-  text: string;
-  timestamp: Date;
-  isThinking?: boolean;
+// Added Batch interface for lot tracking
+export interface Batch {
+  id: string;
+  batch_number: string;
+  item_id: string;
+  item_name: string;
+  initial_quantity: number;
+  current_quantity: number;
+  production_date: string;
+  expiry_date: string;
+  status: 'active' | 'quarantine' | 'expired';
+  location_id: string;
+}
+
+// Added Contact and Company for business management
+export interface Contact {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  role: string;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  email: string;
+  phone: string;
+  is_own_company: boolean;
+  industry?: string;
+  website?: string;
+  tax_id?: string;
+  logo_url?: string;
+  contacts?: Contact[];
+}
+
+// Added personnel management interfaces
+export interface WorkShift {
+  id: string;
+  user_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  status: 'active' | 'completed' | 'scheduled';
+}
+
+export interface TimeLog {
+  id: string;
+  user_id: string;
+  shift_id: string;
+  clock_in: string;
+  clock_out?: string;
+  notes?: string;
+}
+
+export interface PayrollRecord {
+  id: string;
+  user_id: string;
+  amount: number;
+  bonus: number;
+  period: string;
+  status: 'paid' | 'pending';
+  processed_at?: string;
 }

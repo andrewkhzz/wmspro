@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Camera, Loader2, Image as ImageIcon, Check, MapPin, Layers, DollarSign, Info, Sparkles, Edit2, Plus, BrainCircuit, Trash2, Cpu, Zap } from 'lucide-react';
-import { autoIdentifyItem } from '../lib/gemini';
-import { MOCK_LOCATIONS, MOCK_WAREHOUSES } from '../lib/constants';
+import { X, Camera, Loader2, Image as ImageIcon, Check, MapPin, Layers, DollarSign, Info, Sparkles, Edit2, Plus, BrainCircuit, Trash2, Cpu, Zap, RefreshCw } from 'lucide-react';
+import { autoIdentifyItem, generateAiSku } from '../lib/gemini';
+import { MOCK_LOCATIONS, MOCK_WAREHOUSES, MOCK_CATEGORIES } from '../lib/constants';
 import { Item, Location, StorageZone } from '../lib/types';
 
 interface Characteristic {
@@ -17,7 +17,9 @@ interface AddItemModalProps {
 
 const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isGeneratingSku, setIsGeneratingSku] = useState(false);
   const [useAiAssist, setUseAiAssist] = useState(true);
+  const [useAiSku, setUseAiSku] = useState(true);
   const [includeCharacteristics, setIncludeCharacteristics] = useState(true);
   const [characteristics, setCharacteristics] = useState<Characteristic[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -52,11 +54,24 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
     return warehouse?.zones || [];
   }, [formData.location_id]);
 
+  const handleGenerateSku = async () => {
+    if (!formData.title) return;
+    setIsGeneratingSku(true);
+    try {
+      const categoryName = MOCK_CATEGORIES.find(c => c.id === formData.category_id)?.name || 'General';
+      const newSku = await generateAiSku(formData.title, categoryName, characteristics);
+      setFormData(prev => ({ ...prev, inventory_number: newSku }));
+    } catch (error) {
+      console.error("SKU Gen Error:", error);
+    } finally {
+      setIsGeneratingSku(false);
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Show local preview immediately
     const reader = new FileReader();
     reader.onloadend = async () => {
         const base64String = reader.result as string;
@@ -72,9 +87,11 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
                 setFormData(prev => ({
                     ...prev,
                     title: analysis.title || prev.title,
+                    category_id: analysis.category_id || prev.category_id,
                     price: analysis.suggested_price || prev.price,
                     condition: analysis.condition || prev.condition,
-                    description: analysis.description || prev.description
+                    description: analysis.description || prev.description,
+                    inventory_number: useAiSku ? (analysis.suggested_sku || prev.inventory_number) : prev.inventory_number
                 }));
 
                 if (includeCharacteristics && analysis.characteristics) {
@@ -107,7 +124,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
   };
 
   const handleSave = () => {
-    // Save logic normally happens here.
     onClose();
   };
 
@@ -158,7 +174,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
                 <div className={`relative aspect-square rounded-sm border-2 border-dashed transition-all overflow-hidden flex flex-col items-center justify-center group ${isAnalyzing ? 'bg-blue-50/50 border-blue-300' : 'bg-white border-slate-200 hover:border-blue-400 shadow-sm'}`}>
                     {isAnalyzing ? (
                         <div className="flex flex-col items-center text-center p-8 relative">
-                            {/* Scanning Animation */}
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-[scan_2s_infinite]"></div>
                             <div className="w-20 h-20 bg-blue-100/50 rounded-full flex items-center justify-center mb-6 animate-pulse">
                               <BrainCircuit size={40} className="text-blue-600" />
@@ -191,30 +206,38 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
               </div>
 
               {useAiAssist && (
-                <div className="bg-white p-6 rounded-sm border border-slate-100 shadow-sm space-y-4">
-                   <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Zap size={16} className="text-amber-500" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">Deep Technical Analysis</span>
+                <div className="bg-white p-6 rounded-sm border border-slate-100 shadow-sm space-y-6">
+                   <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-2">
+                           <Zap size={16} className="text-amber-500" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">Technical Analysis</span>
+                         </div>
+                         <button 
+                           onClick={() => setIncludeCharacteristics(!includeCharacteristics)}
+                           className={`w-10 h-5 rounded-full relative transition-colors ${includeCharacteristics ? 'bg-blue-600' : 'bg-slate-200'}`}
+                         >
+                            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${includeCharacteristics ? 'left-6' : 'left-1'}`}></div>
+                         </button>
                       </div>
-                      <button 
-                        onClick={() => setIncludeCharacteristics(!includeCharacteristics)}
-                        className={`w-10 h-5 rounded-full relative transition-colors ${includeCharacteristics ? 'bg-blue-600' : 'bg-slate-200'}`}
-                      >
-                         <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${includeCharacteristics ? 'left-6' : 'left-1'}`}></div>
-                      </button>
+                      <p className="text-[10px] text-slate-400 leading-relaxed font-medium">Extract precise technical specs from visual data.</p>
                    </div>
-                   <p className="text-[10px] text-slate-400 leading-relaxed font-medium">When active, AI will attempt to extract precise technical specs like dimensions, material, and electrical ratings from the image.</p>
-                </div>
-              )}
 
-              {!isAnalyzing && !imagePreview && useAiAssist && (
-                <div className="p-6 bg-blue-50/40 rounded-sm border border-blue-100 flex items-start gap-4">
-                    <Sparkles className="text-blue-600 shrink-0 mt-0.5" size={20} />
-                    <div>
-                       <h4 className="text-[10px] font-black text-blue-800 uppercase tracking-widest mb-1">Intelligence Mode</h4>
-                       <p className="text-[10px] text-blue-700 leading-relaxed font-medium italic">"Upload a clear image of the item or its technical nameplate for best results."</p>
-                    </div>
+                   <div className="space-y-4 border-t border-slate-50 pt-4">
+                      <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-2">
+                           <Layers size={16} className="text-blue-500" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">AI SKU Generation</span>
+                         </div>
+                         <button 
+                           onClick={() => setUseAiSku(!useAiSku)}
+                           className={`w-10 h-5 rounded-full relative transition-colors ${useAiSku ? 'bg-[#0052FF]' : 'bg-slate-200'}`}
+                         >
+                            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${useAiSku ? 'left-6' : 'left-1'}`}></div>
+                         </button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 leading-relaxed font-medium">Automatically derive a structured SKU from title and specs.</p>
+                   </div>
                 </div>
               )}
             </div>
@@ -232,11 +255,46 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
                        placeholder="Enter technical title..." 
                      />
                   </div>
+
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Global Tracking SKU</label>
+                     <div className="relative group">
+                        <input 
+                          type="text" 
+                          value={formData.inventory_number} 
+                          onChange={e => setFormData({...formData, inventory_number: e.target.value})}
+                          className="w-full px-6 py-4 bg-white border border-slate-100 rounded-sm font-mono font-bold text-sm focus:ring-4 focus:ring-blue-500/[0.05] transition-all outline-none" 
+                        />
+                        {useAiSku && (
+                           <button 
+                             onClick={handleGenerateSku}
+                             disabled={isGeneratingSku || !formData.title}
+                             className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 bg-slate-50 hover:bg-[#0052FF] hover:text-white text-slate-400 rounded-sm transition-all disabled:opacity-40"
+                             title="Regenerate with AI"
+                           >
+                             {isGeneratingSku ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                           </button>
+                        )}
+                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Market Classification</label>
+                     <select 
+                       value={formData.category_id}
+                       onChange={e => setFormData({...formData, category_id: Number(e.target.value)})}
+                       className="w-full px-6 py-4 bg-white border border-slate-100 rounded-sm font-bold text-sm focus:ring-4 focus:ring-blue-500/[0.05] transition-all outline-none"
+                     >
+                        {MOCK_CATEGORIES.map(c => (
+                           <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                     </select>
+                  </div>
                   
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Market Valuation (USD)</label>
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Market Valuation (₽)</label>
                      <div className="relative">
-                        <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₽</span>
                         <input 
                           type="number"
                           value={formData.price} 
@@ -257,6 +315,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
                   </div>
                </div>
 
+               {/* Location / Zone mapping */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
@@ -271,71 +330,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
                            <option key={loc.id} value={loc.id}>{loc.name}</option>
                         ))}
                      </select>
-                  </div>
-                  <div className="space-y-2">
-                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
-                        <Layers size={10} className="text-blue-600" /> Active Sector
-                     </label>
-                     <select 
-                        value={formData.zone_id}
-                        onChange={e => setFormData({...formData, zone_id: e.target.value})}
-                        className="w-full px-6 py-4 bg-white border border-slate-100 rounded-sm font-bold text-sm focus:ring-4 focus:ring-blue-500/[0.05] outline-none appearance-none disabled:opacity-50"
-                        disabled={availableZones.length === 0}
-                     >
-                        <option value="">Map to Sector...</option>
-                        {availableZones.map(zone => (
-                           <option key={zone.id} value={zone.id}>{zone.name} ({zone.code})</option>
-                        ))}
-                     </select>
-                  </div>
-               </div>
-
-               {/* Dynamic Characteristics */}
-               <div className="space-y-4">
-                  <div className="flex items-center justify-between px-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
-                        <Cpu size={12} className="text-blue-600" /> Technical Matrix
-                    </label>
-                    <button 
-                      onClick={addCharacteristic}
-                      className="text-[9px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2 hover:bg-blue-50 px-2 py-1 rounded-sm transition-all"
-                    >
-                      <Plus size={12} /> Add Parameter
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {characteristics.map((char, index) => (
-                      <div key={index} className="flex gap-2 animate-fade-in group items-center">
-                         <div className="flex-1 flex border border-slate-100 rounded-sm overflow-hidden shadow-sm bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
-                            <input 
-                                type="text" 
-                                placeholder="Attribute" 
-                                value={char.label} 
-                                onChange={e => updateCharacteristic(index, 'label', e.target.value)}
-                                className="w-1/2 px-3 py-2 text-[11px] font-bold border-r border-slate-50 outline-none"
-                            />
-                            <input 
-                                type="text" 
-                                placeholder="Value" 
-                                value={char.value} 
-                                onChange={e => updateCharacteristic(index, 'value', e.target.value)}
-                                className="w-1/2 px-3 py-2 text-[11px] font-bold outline-none bg-slate-50/30"
-                            />
-                         </div>
-                         <button 
-                          onClick={() => removeCharacteristic(index)}
-                          className="p-2 text-slate-300 hover:text-red-500 transition-colors shrink-0"
-                         >
-                            <Trash2 size={14} />
-                         </button>
-                      </div>
-                    ))}
-                    {characteristics.length === 0 && (
-                      <div className="md:col-span-2 py-6 border border-dashed border-slate-200 rounded-sm text-center bg-white/50">
-                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">No Technical Specifications Mapped</p>
-                      </div>
-                    )}
                   </div>
                </div>
 
@@ -363,15 +357,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, editItem }) => {
             </button>
         </div>
       </div>
-
-      <style>{`
-        @keyframes scan {
-          0% { transform: translateY(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(400px); opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 };

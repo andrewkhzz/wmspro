@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronLeft, ShoppingCart, ShieldCheck, Truck, Clock, Info, Heart, Share2, Star, Box, Package, ArrowUpRight, Globe, Layers, Cpu, Calendar, Activity, QrCode } from 'lucide-react';
+import { ChevronLeft, ShoppingCart, ShieldCheck, Truck, Clock, Info, Heart, Share2, Star, Box, Package, ArrowUpRight, Globe, Layers, Cpu, Calendar, Activity, QrCode, User, Building2, Zap, ShieldAlert } from 'lucide-react';
 import { Item, Batch } from '../../lib/types';
 import { MOCK_BATCHES } from '../../lib/constants';
 
@@ -42,10 +42,10 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                    onClick={() => onToggleFavorite(item.id)}
                    className="p-4 bg-white/70 backdrop-blur-xl rounded-sm border border-white/40 shadow-xl hover:bg-white transition-all active:scale-90"
                  >
-                   <Heart size={20} fill={isFavorite ? '#EF4444' : 'none'} className={isFavorite ? 'text-red-500' : 'text-slate-900'} />
+                   <Heart size={20} fill={isFavorite ? '#EF4444' : 'none'} className={isFavorite ? 'text-red-500' : 'text-slate-700'} />
                  </button>
                  <button className="p-4 bg-white/70 backdrop-blur-xl rounded-sm border border-white/40 shadow-xl hover:bg-white transition-all">
-                   <Share2 size={20} className="text-slate-900" />
+                   <Share2 size={20} className="text-slate-700" />
                  </button>
               </div>
               {item.is_featured && (
@@ -61,13 +61,13 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                 { label: 'Condition', val: item.condition.replace('_', ' '), icon: <ShieldCheck size={16} /> },
                 { label: 'Asset Code', val: item.inventory_number.split('-')[0], icon: <Layers size={16} /> },
                 { label: 'Batch Sync', val: itemBatches.length > 0 ? 'Active' : 'N/A', icon: <Clock size={16} /> },
-                { label: 'Node', val: 'RU-01', icon: <Globe size={16} /> },
+                { label: 'Network', val: 'Nexus-RU', icon: <Globe size={16} /> },
               ].map(spec => (
                 <div key={spec.label} className="bg-white p-5 rounded-sm border border-slate-100 shadow-sm flex flex-col gap-3">
                    <div className="text-[#0052FF]">{spec.icon}</div>
                    <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{spec.label}</p>
-                      <p className="text-xs font-black text-slate-900 uppercase mt-1">{spec.val}</p>
+                      <p className="text-xs font-black text-slate-700 uppercase mt-1">{spec.val}</p>
                    </div>
                 </div>
               ))}
@@ -78,7 +78,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
               <div className="p-6 border-b border-slate-200 bg-white/50 flex items-center justify-between">
                  <div className="flex items-center gap-3">
                     <QrCode size={20} className="text-blue-600" />
-                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Serialized Lot Inventory</h3>
+                    <h3 className="text-sm font-black text-slate-700 uppercase tracking-widest">Serialized Lot Inventory</h3>
                  </div>
                  <span className="text-[10px] font-black text-slate-400 uppercase">{itemBatches.length} Active Lots</span>
               </div>
@@ -91,14 +91,14 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                              <Package size={18} />
                           </div>
                           <div>
-                             <p className="font-mono text-sm font-black text-slate-900 tracking-tighter">{batch.batch_number}</p>
+                             <p className="font-mono text-sm font-black text-slate-700 tracking-tighter">{batch.batch_number}</p>
                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Production Origin: {batch.production_date}</p>
                           </div>
                        </div>
                        
                        <div className="flex items-center gap-12">
                           <div className="text-center">
-                             <p className="text-sm font-black text-slate-900">{batch.current_quantity}</p>
+                             <p className="text-sm font-black text-slate-700">{batch.current_quantity}</p>
                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Units Available</p>
                           </div>
                           
@@ -112,7 +112,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                           
                           <div className="text-right min-w-[80px]">
                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Expiry</p>
-                             <p className={`text-[11px] font-bold ${new Date(batch.expiry_date) < new Date() ? 'text-red-500' : 'text-slate-900'}`}>
+                             <p className={`text-[11px] font-bold ${new Date(batch.expiry_date) < new Date() ? 'text-red-500' : 'text-slate-700'}`}>
                                 {batch.expiry_date}
                              </p>
                           </div>
@@ -135,16 +135,16 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                  <span className="text-[10px] font-black text-[#0052FF] uppercase tracking-[0.3em] bg-blue-50 px-3 py-1 rounded-sm">Industrial Grade</span>
                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] bg-slate-100 px-3 py-1 rounded-sm">Traceable SKU</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-slate-950 leading-[1.1] tracking-tighter">
+              <h1 className="text-4xl md:text-5xl font-black text-slate-700 leading-[1.1] tracking-tighter">
                 {item.title}
               </h1>
               <div className="flex items-end gap-3 pt-4">
-                 <p className="text-5xl font-medium text-slate-950 tracking-tight">${item.price.toLocaleString()}</p>
-                 <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">USD / Unit</p>
+                 <p className="text-5xl font-medium text-slate-800 tracking-tight">{item.price.toLocaleString()} ₽</p>
+                 <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">RUB / Unit</p>
               </div>
            </div>
 
-           <div className="p-8 bg-slate-950 rounded-sm text-white space-y-8 relative overflow-hidden shadow-2xl shadow-slate-900/30">
+           <div className="p-8 bg-slate-900 rounded-sm text-white space-y-8 relative overflow-hidden shadow-2xl">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
               
               <div className="flex justify-between items-center relative z-10">
@@ -168,35 +168,79 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
               </div>
            </div>
 
-           {/* Seller Info Segment */}
+           {/* Seller Node Identity Block */}
            <div 
              onClick={() => onNavigateStore(item.seller_name || '')}
-             className="flex items-center gap-6 p-6 bg-white rounded-sm border border-slate-100 hover:border-blue-200 transition-all cursor-pointer shadow-sm group"
+             className="bg-white rounded-sm border border-slate-100 hover:border-blue-200 transition-all cursor-pointer shadow-sm group overflow-hidden"
            >
-              <img src={`https://picsum.photos/seed/${item.seller_name}/100/100`} className="w-16 h-16 rounded-sm grayscale group-hover:grayscale-0 transition-all" />
-              <div className="flex-1">
-                 <div className="flex items-center gap-2">
-                    <h4 className="font-black text-slate-900 text-sm">{item.seller_name}</h4>
-                    <ShieldCheck size={14} className="text-[#0052FF]" />
-                 </div>
-                 <div className="flex items-center gap-4 mt-1">
-                    <div className="flex items-center gap-1 text-amber-500">
-                       <Star size={10} fill="currentColor" />
-                       <span className="text-[10px] font-black text-slate-500">{item.seller_rating} Rating</span>
+              <div className="p-6 flex items-center gap-6 border-b border-slate-50 bg-slate-50/30">
+                 <div className="relative shrink-0">
+                    <img src={`https://picsum.photos/seed/${item.seller_name}/100/100`} className="w-16 h-16 rounded-sm grayscale group-hover:grayscale-0 transition-all" />
+                    <div className={`absolute -bottom-1 -right-1 p-1 rounded-full border-2 border-white shadow-sm ${
+                      item.seller_type === 'enterprise' ? 'bg-blue-600 text-white' : 'bg-amber-50 text-white'
+                    }`}>
+                      {item.seller_type === 'enterprise' ? <Building2 size={10} /> : <User size={10} />}
                     </div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verified Seller</span>
+                 </div>
+                 <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                       <h4 className="font-black text-slate-700 text-sm truncate">{item.seller_name}</h4>
+                       <ShieldCheck size={14} className="text-[#0052FF] shrink-0" />
+                    </div>
+                    <div className="flex items-center gap-3 mt-0.5">
+                       <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm border ${
+                         item.seller_type === 'enterprise' ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-amber-50 border-amber-100 text-amber-600'
+                       }`}>
+                         {item.seller_type === 'enterprise' ? 'Enterprise Entity' : 'Independent Node'}
+                       </span>
+                       <div className="flex items-center gap-1 text-amber-500">
+                          <Star size={10} fill="currentColor" />
+                          <span className="text-[10px] font-black text-slate-500">{item.seller_rating} Rating</span>
+                       </div>
+                    </div>
+                 </div>
+                 <ArrowUpRight size={20} className="text-slate-300 group-hover:text-[#0052FF] transition-colors shrink-0" />
+              </div>
+
+              {/* Integrity Matrix */}
+              <div className="p-6 grid grid-cols-3 gap-6">
+                 <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                       <ShieldAlert size={10} /> Reliability
+                    </p>
+                    <div className="h-1 bg-slate-100 rounded-full w-full overflow-hidden">
+                       <div className="bg-blue-600 h-full" style={{ width: `${item.seller_metrics?.reliability || 90}%` }}></div>
+                    </div>
+                    <p className="text-[9px] font-black text-slate-700 mt-1.5">{item.seller_metrics?.reliability || 90}%</p>
+                 </div>
+                 <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                       <Truck size={10} /> Speed
+                    </p>
+                    <div className="h-1 bg-slate-100 rounded-full w-full overflow-hidden">
+                       <div className="bg-blue-600 h-full" style={{ width: `${item.seller_metrics?.delivery_speed || 85}%` }}></div>
+                    </div>
+                    <p className="text-[9px] font-black text-slate-700 mt-1.5">{item.seller_metrics?.delivery_speed || 85}%</p>
+                 </div>
+                 <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                       <Zap size={10} /> Trust
+                    </p>
+                    <div className="h-1 bg-slate-100 rounded-full w-full overflow-hidden">
+                       <div className="bg-blue-600 h-full" style={{ width: `${item.seller_metrics?.integrity_score || 95}%` }}></div>
+                    </div>
+                    <p className="text-[9px] font-black text-slate-700 mt-1.5">{item.seller_metrics?.integrity_score || 95}%</p>
                  </div>
               </div>
-              <ArrowUpRight size={20} className="text-slate-300 group-hover:text-[#0052FF] transition-colors" />
            </div>
 
            {/* Descriptive Segment */}
            <div className="space-y-4">
-              <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-700 uppercase tracking-[0.3em] flex items-center gap-2">
                  <Info size={16} className="text-[#0052FF]" /> Intelligence Summary
               </h3>
               <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                 {item.description || `This high-performance industrial asset (SKU: ${item.inventory_number}) has been verified through the Nexus neural logistics grid. Detailed testing confirms compliance with grade ${item.condition.toUpperCase()} standards. Immediate dispatch available from node RU-01 central warehouse.`}
+                 {item.description || `This high-performance industrial asset (SKU: ${item.inventory_number}) has been verified through the Nexus neural logistics grid. Detailed testing confirms compliance with grade ${item.condition.toUpperCase()} standards. Immediate dispatch available.`}
               </p>
            </div>
         </div>
