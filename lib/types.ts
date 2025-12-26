@@ -124,6 +124,7 @@ export interface Story {
   font_size?: number;
   font_family?: string;
   animation_effect?: string;
+  auto_scroll?: boolean;
   duration_seconds: number;
   has_sound: boolean;
   allow_replies: boolean;

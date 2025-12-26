@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, ChevronLeft, Send, Sparkles, BrainCircuit, Loader2, 
   Image as ImageIcon, Zap, Type, ShoppingBag, BarChart2, 
@@ -7,7 +7,8 @@ import {
   Trash2, Smartphone, Monitor, Layers, Wand2, ArrowRight,
   Cpu, Target, Activity, Terminal, Binary, Fingerprint, 
   Scan, Radio, Orbit, Settings2, ChevronDown, PlusCircle,
-  Globe, UploadCloud, Link as LinkIcon, Heart, Wand, Move
+  Globe, UploadCloud, Link as LinkIcon, Heart, Wand, Move,
+  Eraser, MousePointer2, AlignJustify
 } from 'lucide-react';
 import { Story, Profile, StoryContentType, CTAActionType } from '../../lib/types';
 import { MOCK_ITEMS } from '../../lib/constants';
@@ -20,12 +21,25 @@ interface StoryComposerProps {
   initialItemId?: string;
 }
 
-const FONTS = ['Roboto', 'Montserrat', 'Inter', 'Open Sans'];
+const FONTS = [
+  { id: 'Montserrat', label: 'Montserrat' },
+  { id: 'Inter', label: 'Inter' },
+  { id: 'Orbitron', label: 'Orbitron' },
+  { id: 'Rajdhani', label: 'Rajdhani' },
+  { id: 'Syncopate', label: 'Syncopate' },
+  { id: 'Goldman', label: 'Goldman' },
+  { id: 'pressstart', label: '8-Bit Retro' }
+];
+
 const ANIMATIONS = [
   { id: 'fade', label: 'Neural Fade' },
   { id: 'slide', label: 'Kinetic Slide' },
   { id: 'glow', label: 'Pulse Glow' },
-  { id: 'zoom', label: 'Spatial Zoom' }
+  { id: 'zoom', label: 'Spatial Zoom' },
+  { id: 'glitch', label: 'Cyber Glitch' },
+  { id: 'reveal', label: 'Reveal Wipe' },
+  { id: 'typewriter', label: 'Typewriter Hub' },
+  { id: 'spin', label: 'Vortex Spin' }
 ];
 
 const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSave, initialItemId }) => {
@@ -41,6 +55,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
     text_color: '#ffffff',
     font_family: 'Montserrat',
     animation_effect: 'slide',
+    auto_scroll: false,
     duration_seconds: 86400,
     allow_replies: true,
     call_to_action_type: 'view_item',
@@ -52,9 +67,8 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
 
   const selectedItem = MOCK_ITEMS.find(i => i.id === formData.linked_item_id);
 
-  // Auto-set visual if linked item is provided initially
   useEffect(() => {
-    if (selectedItem && formData.media_urls.length === 0) {
+    if (selectedItem && formData.media_urls?.length === 0) {
       setFormData(prev => ({ ...prev, media_urls: [selectedItem.image_url || ''] }));
     }
   }, [selectedItem]);
@@ -74,6 +88,18 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
       }));
     } finally {
       setIsStyleAiLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    if (confirm('Clear neural buffer? All unsaved data will be purged.')) {
+      setFormData({
+        ...formData,
+        title: '',
+        content_text: '',
+        media_urls: [],
+        tags: []
+      });
     }
   };
 
@@ -135,24 +161,32 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
           <ChevronLeft size={18} />
           Cancel
         </button>
-        <button 
-          onClick={handleMagicStyle}
-          disabled={isStyleAiLoading}
-          className="flex items-center gap-3 px-8 py-3 bg-slate-900 text-white rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:opacity-50 group"
-        >
-          {isStyleAiLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="text-yellow-400 group-hover:rotate-12 transition-transform" />}
-          Neural Synergy Alchemy
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={handleReset}
+            className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-400 rounded-full text-[11px] font-black uppercase tracking-widest hover:text-red-500 transition-all shadow-sm active:scale-95"
+          >
+            <Eraser size={14} /> Reset Buffer
+          </button>
+          <button 
+            onClick={handleMagicStyle}
+            disabled={isStyleAiLoading}
+            className="flex items-center gap-3 px-8 py-3 bg-slate-900 text-white rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:opacity-50 group"
+          >
+            {isStyleAiLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="text-yellow-400 group-hover:rotate-12 transition-transform" />}
+            Neural Synergy Alchemy
+          </button>
+        </div>
       </div>
 
-      {/* 2. Main Content Grid - Reduced padding-bottom for better visibility */}
+      {/* 2. Main Content Grid */}
       <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-8 flex flex-col lg:flex-row gap-12 justify-center items-start pb-20">
         
         {/* --- LEFT: FORM SECTION --- */}
         <div className="w-full lg:w-[540px] bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10 space-y-8 animate-scale-up">
            <div className="flex items-center gap-3">
              <PlusCircle size={28} className="text-[#0088CC] fill-blue-50" />
-             <h2 className="text-2xl font-black tracking-tight text-slate-900">Create New Story</h2>
+             <h2 className="text-2xl font-black tracking-tight text-slate-900">Nexus Studio Log</h2>
            </div>
 
            {/* Field: Image Upload */}
@@ -210,24 +244,35 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
               <textarea 
                 value={formData.content_text}
                 onChange={(e) => setFormData({...formData, content_text: e.target.value})}
-                placeholder="Log details of the distribution event..."
+                placeholder="Log technical details of the asset..."
                 className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-xl font-bold text-sm outline-none h-32 resize-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-[#0088CC]/30 transition-all placeholder:text-slate-300 leading-relaxed"
               />
            </div>
 
-           {/* Creative Suite Tab (Compact) */}
-           <div className="space-y-4 bg-slate-50/50 p-6 rounded-[1.5rem] border border-slate-100">
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                 <Palette size={14} className="text-blue-500" /> Styles & Effects
-              </h3>
+           {/* Creative Suite Tab (Enhanced) */}
+           <div className="space-y-6 bg-slate-50/50 p-6 rounded-[1.5rem] border border-slate-100">
+              <div className="flex items-center justify-between">
+                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Palette size={14} className="text-blue-500" /> Typography & Motion
+                </h3>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-500 transition-colors">Neural Scroll</span>
+                  <button 
+                    onClick={() => setFormData({...formData, auto_scroll: !formData.auto_scroll})}
+                    className={`w-8 h-4 rounded-full relative transition-colors ${formData.auto_scroll ? 'bg-blue-600' : 'bg-slate-300'}`}
+                  >
+                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${formData.auto_scroll ? 'right-0.5' : 'left-0.5'}`} />
+                  </button>
+                </label>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative">
                     <select 
                       value={formData.font_family}
                       onChange={e => setFormData({...formData, font_family: e.target.value})}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-bold outline-none appearance-none cursor-pointer"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-3 text-[10px] font-black uppercase tracking-widest outline-none appearance-none cursor-pointer focus:border-blue-500/50 transition-colors"
                     >
-                      {FONTS.map(f => <option key={f} value={f}>{f}</option>)}
+                      {FONTS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
                     </select>
                     <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
@@ -235,23 +280,23 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
                     <select 
                       value={formData.animation_effect}
                       onChange={e => setFormData({...formData, animation_effect: e.target.value})}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-bold outline-none appearance-none cursor-pointer"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-3 text-[10px] font-black uppercase tracking-widest outline-none appearance-none cursor-pointer focus:border-blue-500/50 transition-colors"
                     >
                       {ANIMATIONS.map(a => <option key={a.id} value={a.id}>{a.label}</option>)}
                     </select>
                     <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                 <div className="flex gap-1.5">
+              <div className="flex items-center justify-between gap-3 bg-white/50 p-3 rounded-xl border border-slate-100">
+                 <div className="flex gap-2">
                     {['#0f172a', '#0052FF', '#db2777', '#059669', '#ffffff'].map(c => (
-                      <button key={c} onClick={() => setFormData({...formData, background_color: c})} className={`w-5 h-5 rounded-full border border-white transition-all ${formData.background_color === c ? 'scale-125 ring-2 ring-blue-500 ring-offset-1' : ''}`} style={{ backgroundColor: c }} />
+                      <button key={c} onClick={() => setFormData({...formData, background_color: c})} className={`w-6 h-6 rounded-full border border-white shadow-sm transition-all ${formData.background_color === c ? 'scale-125 ring-2 ring-blue-500 ring-offset-2' : ''}`} style={{ backgroundColor: c }} />
                     ))}
                  </div>
-                 <div className="h-4 w-px bg-slate-200 mx-2" />
-                 <div className="flex gap-1.5">
-                    {['#ffffff', '#94a3b8', '#1e293b', '#60a5fa'].map(c => (
-                      <button key={c} onClick={() => setFormData({...formData, text_color: c})} className={`w-5 h-5 rounded-full border border-white transition-all ${formData.text_color === c ? 'scale-125 ring-2 ring-blue-500 ring-offset-1' : ''}`} style={{ backgroundColor: c }} />
+                 <div className="h-4 w-px bg-slate-200" />
+                 <div className="flex gap-2">
+                    {['#ffffff', '#94a3b8', '#1e293b', '#60a5fa', '#fde047'].map(c => (
+                      <button key={c} onClick={() => setFormData({...formData, text_color: c})} className={`w-6 h-6 rounded-full border border-white shadow-sm transition-all ${formData.text_color === c ? 'scale-125 ring-2 ring-blue-500 ring-offset-2' : ''}`} style={{ backgroundColor: c }} />
                     ))}
                  </div>
               </div>
@@ -354,46 +399,57 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
                  <div className="relative z-10 w-full px-8 text-left mt-auto pb-32">
                     <h3 
                       className={`text-2xl font-black leading-tight uppercase tracking-tighter mb-4 animation-${formData.animation_effect}`} 
-                      style={{ color: formData.text_color, fontFamily: formData.font_family }}
+                      style={{ 
+                        color: formData.text_color, 
+                        fontFamily: formData.font_family === 'pressstart' ? '"Press Start 2P"' : formData.font_family,
+                        fontSize: formData.font_family === 'pressstart' ? '14px' : undefined
+                      }}
                     >
                        {formData.title || 'Awaiting Input...'}
                     </h3>
-                    <p 
-                      className={`text-[13px] font-medium leading-relaxed opacity-80 line-clamp-3 animation-${formData.animation_effect}`}
-                      style={{ color: formData.text_color, fontFamily: formData.font_family }}
-                    >
-                       {formData.content_text || 'Enter a spatial description to initialize metadata sync...'}
-                    </p>
+                    
+                    <div className={`relative h-20 overflow-hidden ${formData.auto_scroll ? 'mask-gradient' : ''}`}>
+                       <p 
+                         className={`text-[13px] font-medium leading-relaxed opacity-80 animation-${formData.animation_effect} ${formData.auto_scroll ? 'animate-neural-scroll' : 'line-clamp-3'}`}
+                         style={{ 
+                           color: formData.text_color, 
+                           fontFamily: formData.font_family === 'pressstart' ? '"Press Start 2P"' : formData.font_family,
+                           fontSize: formData.font_family === 'pressstart' ? '10px' : undefined
+                         }}
+                       >
+                          {formData.content_text || 'Initialize metadata sync to begin spatial projection...'}
+                       </p>
+                    </div>
 
                     {/* COOLER LINKED ITEM CARD */}
                     {formData.linked_item_id && selectedItem && (
-                       <div className="mt-8 relative group/card animate-slide-up">
+                       <div className="mt-6 relative group/card animate-slide-up">
                           {/* Pulsing Outer Glow */}
                           <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 rounded-[2.25rem] blur-md opacity-40 group-hover/card:opacity-80 transition duration-1000 group-hover/card:duration-200 animate-pulse"></div>
                           
-                          <div className="relative bg-black/60 backdrop-blur-2xl rounded-[2rem] border border-white/20 p-5 flex items-center justify-between shadow-2xl ring-1 ring-white/10 group-hover/card:bg-black/70 transition-all overflow-hidden">
+                          <div className="relative bg-black/60 backdrop-blur-2xl rounded-[2rem] border border-white/20 p-4 flex items-center justify-between shadow-2xl ring-1 ring-white/10 group-hover/card:bg-black/70 transition-all overflow-hidden">
                              {/* Static Scan Line Effect */}
-                             <div className="absolute inset-0 w-full h-[1px] bg-white/10 top-1/2 -translate-y-1/2 pointer-events-none" />
+                             <div className="absolute inset-0 w-full h-[1px] bg-white/10 top-1/2 -translate-y-1/2 pointer-events-none animate-[scan_3s_linear_infinite]" />
                              
                              <div className="flex items-center gap-4 min-w-0 relative z-10">
-                                <div className="w-16 h-16 bg-slate-800 rounded-xl overflow-hidden border border-white/20 shrink-0 shadow-2xl">
+                                <div className="w-14 h-14 bg-slate-800 rounded-xl overflow-hidden border border-white/20 shrink-0 shadow-2xl">
                                    <img src={selectedItem.image_url} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="min-w-0">
                                    <div className="flex items-center gap-1.5 mb-1">
-                                      <Zap size={10} className="text-cyan-400 fill-cyan-400 animate-pulse" />
-                                      <p className="text-[9px] font-black text-cyan-400 uppercase tracking-[0.2em]">NEURAL SKU</p>
+                                      <Zap size={8} className="text-cyan-400 fill-cyan-400 animate-pulse" />
+                                      <p className="text-[8px] font-black text-cyan-400 uppercase tracking-[0.2em]">NODE ASSET</p>
                                    </div>
-                                   <h4 className="text-[11px] font-black text-white leading-tight truncate uppercase tracking-tighter">{selectedItem.title}</h4>
+                                   <h4 className="text-[10px] font-black text-white leading-tight truncate uppercase tracking-tighter">{selectedItem.title}</h4>
                                    <div className="flex items-baseline gap-1 mt-1">
-                                      <p className="text-[14px] font-black text-white tracking-tighter">{selectedItem.price.toLocaleString()}</p>
-                                      <p className="text-[8px] font-bold text-slate-400 uppercase">RUB</p>
+                                      <p className="text-[12px] font-black text-white tracking-tighter">{selectedItem.price.toLocaleString()}</p>
+                                      <p className="text-[7px] font-bold text-slate-400 uppercase">RUB</p>
                                    </div>
                                 </div>
                              </div>
                              
-                             <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl shadow-blue-500/40 active:scale-90 transition-transform cursor-pointer relative z-10">
-                                <ArrowRight size={18} strokeWidth={3} />
+                             <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-xl shadow-blue-500/40 active:scale-90 transition-transform cursor-pointer relative z-10">
+                                <ArrowRight size={14} strokeWidth={3} />
                              </div>
                           </div>
                        </div>
@@ -476,11 +532,54 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
           from { transform: scale(0.9); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
+        @keyframes cyber-glitch {
+          0% { transform: translate(0); text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff; }
+          20% { transform: translate(-2px, 2px); }
+          40% { transform: translate(-2px, -2px); text-shadow: -2px 2px #ff00ff, 2px -2px #00ffff; }
+          60% { transform: translate(2px, 2px); }
+          80% { transform: translate(2px, -2px); text-shadow: 2px -2px #ff00ff, -2px 2px #00ffff; }
+          100% { transform: translate(0); }
+        }
+        @keyframes reveal-wipe {
+          from { clip-path: inset(0 100% 0 0); }
+          to { clip-path: inset(0 0 0 0); }
+        }
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        @keyframes vortex-spin {
+          from { transform: rotate(-10deg) scale(0.8); opacity: 0; }
+          to { transform: rotate(0) scale(1); opacity: 1; }
+        }
+        @keyframes scroll-up {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-100%); }
+        }
+        @keyframes grid-scan {
+          0% { transform: translateY(-100%); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(100%); opacity: 0; }
+        }
 
         .animation-fade { animation: neural-fade 1s ease-out forwards; }
         .animation-slide { animation: kinetic-slide 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animation-glow { animation: neural-fade 1s ease-out forwards, pulse-glow 3s infinite; }
         .animation-zoom { animation: spatial-zoom 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animation-glitch { animation: cyber-glitch 0.5s infinite; }
+        .animation-reveal { animation: reveal-wipe 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animation-typewriter { overflow: hidden; white-space: nowrap; animation: typewriter 2s steps(40, end); }
+        .animation-spin { animation: vortex-spin 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .animate-neural-scroll {
+          animation: scroll-up 10s linear infinite;
+          padding-top: 100%; /* Start below the mask */
+        }
+
+        .mask-gradient {
+          mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+          -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
