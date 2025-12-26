@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronLeft, ShoppingCart, ShieldCheck, Truck, Clock, Info, Heart, Share2, Star, Box, Package, ArrowUpRight, Globe, Layers, Cpu, Calendar, Activity, QrCode, User, Building2, Zap, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, ShoppingCart, ShieldCheck, Truck, Clock, Info, Heart, Share2, Star, Box, Package, ArrowUpRight, Globe, Layers, Cpu, Calendar, Activity, QrCode, User, Building2, Zap, ShieldAlert, Sparkles } from 'lucide-react';
 import { Item, Batch } from '../../lib/types';
 import { MOCK_BATCHES } from '../../lib/constants';
 
@@ -10,6 +10,7 @@ interface ItemDetailViewProps {
   onToggleFavorite: (id: string) => void;
   isFavorite: boolean;
   onNavigateStore: (userId: string) => void;
+  onCreateStory?: () => void;
 }
 
 const ItemDetailView: React.FC<ItemDetailViewProps> = ({ 
@@ -17,7 +18,8 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
   onBack, 
   onToggleFavorite, 
   isFavorite,
-  onNavigateStore
+  onNavigateStore,
+  onCreateStory
 }) => {
   // Filter batches specifically for this item
   const itemBatches = MOCK_BATCHES.filter(b => b.item_id === item.id);
@@ -144,7 +146,7 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
               </div>
            </div>
 
-           <div className="p-8 bg-slate-900 rounded-sm text-white space-y-8 relative overflow-hidden shadow-2xl">
+           <div className="p-8 bg-slate-900 rounded-sm text-white space-y-4 relative overflow-hidden shadow-2xl">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
               
               <div className="flex justify-between items-center relative z-10">
@@ -158,9 +160,15 @@ const ItemDetailView: React.FC<ItemDetailViewProps> = ({
                  </div>
               </div>
 
-              <div className="space-y-4 relative z-10">
+              <div className="space-y-4 relative z-10 pt-4">
                  <button className="w-full py-6 bg-[#0052FF] hover:bg-[#0041CC] text-white rounded-sm font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center gap-3">
                     <ShoppingCart size={18} /> Initialize Procurement
+                 </button>
+                 <button 
+                  onClick={onCreateStory}
+                  className="w-full py-6 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 hover:from-blue-600/30 hover:to-indigo-600/30 text-white border border-blue-500/30 rounded-sm font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 group"
+                 >
+                    <Sparkles size={18} className="text-blue-400 group-hover:rotate-12 transition-transform" /> Promote on Grid
                  </button>
                  <button className="w-full py-6 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-sm font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
                     Inquire Availability

@@ -10,7 +10,7 @@ import {
 import { Story, Profile, StoryContentType, CTAActionType } from '../../lib/types';
 import { MOCK_STORIES, MOCK_HIGHLIGHTS } from '../../lib/constants';
 import { enhanceStory, generateStoryArt, analyzeStoryPerformance, generateProductStory } from '../../lib/gemini';
-import StoryComposer from './StoryComposer'; // Added import
+import StoryComposer from './StoryComposer';
 
 interface StoryManagerViewProps {
   currentUser: Profile;
@@ -21,7 +21,7 @@ const StoryManagerView: React.FC<StoryManagerViewProps> = ({ currentUser, onBack
   const [stories, setStories] = useState<Story[]>(
     MOCK_STORIES.filter(s => s.user_id === currentUser.id)
   );
-  const [isComposerOpen, setIsComposerOpen] = useState(false); // Changed from modal
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'active' | 'highlights' | 'analytics'>('active');
 
   const handleSaveNewStory = (newStory: Story) => {
@@ -29,25 +29,26 @@ const StoryManagerView: React.FC<StoryManagerViewProps> = ({ currentUser, onBack
     setIsComposerOpen(false);
   };
 
+  // If composer is open, we take over the entire content area
   if (isComposerOpen) {
     return <StoryComposer currentUser={currentUser} onBack={() => setIsComposerOpen(false)} onSave={handleSaveNewStory} />;
   }
 
   return (
-    <div className="animate-fade-in space-y-10 pb-32 font-opensans">
+    <div className="animate-fade-in space-y-10 pb-32 font-opensans px-6 md:px-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
          <div className="flex items-center gap-6">
-            <button onClick={onBack} className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-               <ChevronLeft size={20} />
+            <button onClick={onBack} className="p-4 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-blue-600 transition-all shadow-sm group">
+               <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
             </button>
             <div>
                <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase font-montserrat">Nexus Studio</h2>
-               <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Manage, analyze, and provision sync logs</p>
+               <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Authoring terminal for distribution logs</p>
             </div>
          </div>
          
          <div className="flex items-center gap-4">
-            <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50">
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200/50">
                {[
                  { id: 'active', label: 'Live Logs', icon: <Activity size={14}/> },
                  { id: 'highlights', label: 'Highlights', icon: <Layers size={14}/> },
@@ -56,7 +57,7 @@ const StoryManagerView: React.FC<StoryManagerViewProps> = ({ currentUser, onBack
                  <button 
                    key={tab.id}
                    onClick={() => setActiveTab(tab.id as any)}
-                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'active' && tab.id === 'active' || activeTab === tab.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                  >
                    {tab.icon} {tab.label}
                  </button>
@@ -64,15 +65,15 @@ const StoryManagerView: React.FC<StoryManagerViewProps> = ({ currentUser, onBack
             </div>
             <button 
               onClick={() => setIsComposerOpen(true)}
-              className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0052FF] transition-all shadow-xl shadow-blue-500/20 flex items-center gap-3 active:scale-95"
+              className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0052FF] transition-all shadow-xl shadow-blue-500/20 flex items-center gap-3 active:scale-95 group"
             >
-              <Plus size={18} strokeWidth={3} /> Provision New Log
+              <Plus size={18} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-500" /> Provision New Log
             </button>
          </div>
       </div>
 
       {activeTab === 'active' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
           {stories.map(story => (
             <div key={story.id} className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col">
                <div className="relative aspect-[9/12] overflow-hidden bg-slate-900">
@@ -117,12 +118,12 @@ const StoryManagerView: React.FC<StoryManagerViewProps> = ({ currentUser, onBack
           ))}
           <button 
             onClick={() => setIsComposerOpen(true)}
-            className="aspect-[9/12] rounded-[2.5rem] border-2 border-dashed border-slate-200 hover:border-blue-400 flex flex-col items-center justify-center text-slate-300 hover:text-blue-500 transition-all group bg-white/40"
+            className="aspect-[9/12] rounded-[2.5rem] border-2 border-dashed border-slate-200 hover:border-blue-400 flex flex-col items-center justify-center text-slate-300 hover:text-blue-500 transition-all group bg-white/40 shadow-inner"
           >
              <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Plus size={32} />
+                <Plus size={32} strokeWidth={2.5} />
              </div>
-             <p className="text-[10px] font-black uppercase tracking-[0.2em]">New Sync Log</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em]">Add Record</p>
           </button>
         </div>
       )}

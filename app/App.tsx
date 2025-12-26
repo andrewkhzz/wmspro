@@ -48,6 +48,7 @@ const App: React.FC = () => {
           <MarketplaceView 
             onNavigateItem={(id) => console.log('Navigate to', id)} 
             onNavigateStore={(id) => console.log('Store', id)}
+            onAddStory={() => setIsFullMarketplace(true)}
             mktSearchOverride={globalSearch}
           />
         );

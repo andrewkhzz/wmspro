@@ -38,6 +38,30 @@ export const enhanceStory = async (rawText: string) => {
   return JSON.parse(response.text || "{}");
 };
 
+export const generateCreativeStoryStyle = async (rawText: string, itemName?: string) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-flash-preview',
+    contents: `Analyze this content: "${rawText}" and linked item: "${itemName || 'none'}". Create an ultimate high-impact creative package.`,
+    config: { 
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING, description: "Punchy short headline" },
+          content_text: { type: Type.STRING, description: "Refined description" },
+          background_color: { type: Type.STRING, description: "HEX color" },
+          text_color: { type: Type.STRING, description: "HEX color contrast to background" },
+          font_family: { type: Type.STRING, description: "One of: Roboto, Montserrat, Inter, Open Sans" },
+          animation_effect: { type: Type.STRING, description: "One of: fade, slide, glow, zoom" }
+        },
+        required: ["title", "content_text", "background_color", "text_color", "font_family", "animation_effect"]
+      }
+    }
+  });
+  return JSON.parse(response.text || "{}");
+};
+
 export const generateStoryArt = async (content: string): Promise<string | null> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -148,7 +172,6 @@ export const generateReportInsight = async (reportType: string): Promise<string>
   return response.text || "Insight unavailable.";
 };
 
-// Fix: Add missing export generateAiSku
 export const generateAiSku = async (title: string, category: string, characteristics: any[]): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -162,7 +185,6 @@ export const generateAiSku = async (title: string, category: string, characteris
   }
 };
 
-// Fix: Add missing export suggestCategoryOptimization
 export const suggestCategoryOptimization = async (categories: any[]) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -187,7 +209,6 @@ export const suggestCategoryOptimization = async (categories: any[]) => {
   }
 };
 
-// Fix: Add missing export generateCategoryVisual
 export const generateCategoryVisual = async (categoryName: string): Promise<string | null> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -203,7 +224,6 @@ export const generateCategoryVisual = async (categoryName: string): Promise<stri
   } catch { return null; }
 };
 
-// Fix: Add missing export summarizeChat
 export const summarizeChat = async (messages: any[]): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -216,7 +236,6 @@ export const summarizeChat = async (messages: any[]): Promise<string> => {
   } catch { return "Intelligence synchronization failed for summary generation."; }
 };
 
-// Fix: Add missing export analyzeStoryPerformance
 export const analyzeStoryPerformance = async (storyId: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -228,7 +247,6 @@ export const analyzeStoryPerformance = async (storyId: string): Promise<string> 
   } catch { return "Engagement data unavailable."; }
 };
 
-// Fix: Add missing export generateProductStory
 export const generateProductStory = async (itemName: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {

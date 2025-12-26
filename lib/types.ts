@@ -28,7 +28,6 @@ export interface Profile {
   department?: string;
 }
 
-// Added Location interface
 export interface Location {
   id: string;
   user_id?: string;
@@ -54,7 +53,6 @@ export interface Location {
   created_at?: string;
 }
 
-// Added StorageBin interface
 export interface StorageBin {
   id: string;
   code: string;
@@ -63,7 +61,6 @@ export interface StorageBin {
   max_volume?: number;
 }
 
-// Added StorageZone interface
 export interface StorageZone {
   id: string;
   name: string;
@@ -72,7 +69,6 @@ export interface StorageZone {
   bins?: StorageBin[];
 }
 
-// Added Warehouse interface
 export interface Warehouse {
   id: string;
   name: string;
@@ -82,7 +78,6 @@ export interface Warehouse {
   zones?: StorageZone[];
 }
 
-// Added Category interface
 export interface Category {
   id: number;
   name: string;
@@ -95,7 +90,6 @@ export interface Category {
   color_code?: string;
 }
 
-// Added Alert interface
 export interface Alert {
   id: string;
   type: 'low_stock' | 'moderation' | 'expiration' | 'system';
@@ -104,7 +98,6 @@ export interface Alert {
   date: string;
 }
 
-// Added Batch interface
 export interface Batch {
   id: string;
   batch_number: string;
@@ -129,6 +122,8 @@ export interface Story {
   background_color?: string;
   text_color?: string;
   font_size?: number;
+  font_family?: string;
+  animation_effect?: string;
   duration_seconds: number;
   has_sound: boolean;
   allow_replies: boolean;
@@ -161,7 +156,6 @@ export interface Story {
   hashtags: string[];
   created_at: string;
   published_at?: string;
-  // UI helper fields
   user_full_name?: string;
   user_avatar?: string;
 }
@@ -228,7 +222,6 @@ export interface AiChatMessage {
   isThinking?: boolean;
 }
 
-// Added ChatMessage interface for MessengerOverlay
 export interface ChatMessage {
   id: string;
   conversation_id: string;
@@ -239,7 +232,6 @@ export interface ChatMessage {
   status: 'sent' | 'delivered' | 'read';
 }
 
-// Added Conversation interface
 export interface Conversation {
   id: string;
   participants: Profile[];
@@ -249,7 +241,6 @@ export interface Conversation {
   updated_at: string;
 }
 
-// Added Contact interface
 export interface Contact {
   id: string;
   first_name: string;
@@ -259,7 +250,6 @@ export interface Contact {
   position: string;
 }
 
-// Added Company interface
 export interface Company {
   id: string;
   name: string;
@@ -276,7 +266,6 @@ export interface Company {
   contacts?: Contact[];
 }
 
-// Added WorkShift interface
 export interface WorkShift {
   id: string;
   user_id: string;
@@ -285,7 +274,6 @@ export interface WorkShift {
   day_of_week: string;
 }
 
-// Added PayrollRecord interface
 export interface PayrollRecord {
   id: string;
   user_id: string;
