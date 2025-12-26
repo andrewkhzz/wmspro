@@ -75,6 +75,7 @@ const FullMarketplacePage: React.FC<FullMarketplacePageProps> = ({ onExit }) => 
             mkt={mkt}
             onNavigateStore={navigateToStore} 
             onNavigateItem={navigateToItem} 
+            onAddStory={() => changeView('my-stories')}
             favorites={favorites} 
             onToggleFavorite={toggleFavorite} 
           />
@@ -97,6 +98,7 @@ const FullMarketplacePage: React.FC<FullMarketplacePageProps> = ({ onExit }) => 
                 onToggleFavorite={toggleFavorite} 
                 onNavigateStore={navigateToStore} 
                 onNavigateItem={navigateToItem} 
+                onAddStory={() => changeView('my-stories')}
               />
             )}
           </div>
@@ -191,7 +193,9 @@ const FullMarketplacePage: React.FC<FullMarketplacePageProps> = ({ onExit }) => 
       case 'my-stories':
         return <StoryManagerView currentUser={currentUser} onBack={() => changeView('stories')} />;
       case 'profile':
-        return changeView('discover');
+        // Fix: Returning void via changeView was causing type assignment error.
+        changeView('discover');
+        return null;
       case 'store':
         return (
           <div className="px-5 md:px-0 min-h-[60vh]">
@@ -204,6 +208,7 @@ const FullMarketplacePage: React.FC<FullMarketplacePageProps> = ({ onExit }) => 
             mkt={mkt}
             onNavigateStore={navigateToStore} 
             onNavigateItem={navigateToItem} 
+            onAddStory={() => changeView('my-stories')}
             favorites={favorites} 
             onToggleFavorite={toggleFavorite} 
           />

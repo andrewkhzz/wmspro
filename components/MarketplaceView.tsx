@@ -5,15 +5,17 @@ import {
   Box, Star, ChevronRight, X, LayoutGrid, List, SlidersHorizontal, Tag, 
   RotateCcw, Check, Target, User, Building2, Activity, ShieldAlert, Layers, Zap,
   ExternalLink, ShoppingBag, ShieldCheck, MapPin, BadgeCheck, Search, Filter, 
-  ArrowUpDown, CheckCircle2, DollarSign, XCircle, ChevronDown
+  ArrowUpDown, CheckCircle2, DollarSign, XCircle, ChevronDown, Plus, Sparkles
 } from 'lucide-react';
-import { MOCK_CATEGORIES } from '../lib/constants';
-import { Item, Category } from '../lib/types';
+import { MOCK_CATEGORIES, MOCK_STORIES, MOCK_PROFILES } from '../lib/constants';
+import { Item, Category, Story } from '../lib/types';
 import { useMarketplace, FilterState } from '../hooks/use-marketplace';
+import StoryPlayer from './marketplace/StoryPlayer';
 
 interface MarketplaceViewProps {
   onNavigateStore?: (userId: string) => void;
   onNavigateItem?: (itemId: string) => void;
+  onAddStory?: () => void; // Handler for adding a new story
   favorites?: string[];
   onToggleFavorite?: (id: string) => void;
   onlyFavorites?: boolean;
@@ -39,6 +41,7 @@ const CategoryIcon: React.FC<{ category: Partial<Category>; className?: string; 
 const MarketplaceView: React.FC<MarketplaceViewProps> = ({ 
   onNavigateStore, 
   onNavigateItem,
+  onAddStory,
   favorites = [], 
   onToggleFavorite,
   onlyFavorites = false,
@@ -50,6 +53,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [selectedStoryIndex, setSelectedStoryIndex] = useState<number | null>(null);
 
   const displayItems = onlyFavorites 
     ? mkt.listings.filter((item: Item) => favorites.includes(item.id))
@@ -79,9 +83,47 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
   return (
     <div className="flex flex-col gap-6 px-4 md:px-6 animate-fade-in relative font-opensans bg-slate-50/30 min-h-screen">
       
+      {/* Nexus Stories Carousel */}
+      {!onlyFavorites && (
+        <div className="pt-4 overflow-hidden">
+           <div className="flex items-center justify-between px-2 mb-4">
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] font-ui flex items-center gap-2">
+                <Sparkles size={12} className="text-blue-500" /> Active Sync Logs
+              </h3>
+              <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Global View</button>
+           </div>
+           <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-2 px-2">
+              <button 
+                onClick={onAddStory}
+                className="flex flex-col items-center gap-2 group shrink-0"
+              >
+                 <div className="w-20 h-20 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 group-hover:border-blue-400 group-hover:text-blue-500 transition-all">
+                    <Plus size={28} />
+                 </div>
+                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-blue-500">Add Story</span>
+              </button>
+              
+              {MOCK_STORIES.map((story, idx) => (
+                <button 
+                  key={story.id} 
+                  onClick={() => setSelectedStoryIndex(idx)}
+                  className="flex flex-col items-center gap-2 group shrink-0"
+                >
+                   <div className="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-blue-600 via-[#0052FF] to-indigo-400 shadow-xl group-hover:scale-105 transition-transform duration-500">
+                      <div className="w-full h-full rounded-full border-[3px] border-white overflow-hidden shadow-inner bg-slate-900">
+                         <img src={story.user_avatar} className="w-full h-full object-cover" />
+                      </div>
+                   </div>
+                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-700 max-w-[80px] truncate">{story.user_full_name}</span>
+                </button>
+              ))}
+           </div>
+        </div>
+      )}
+
       {/* Category Ribbon */}
       {!onlyFavorites && (
-        <div className="space-y-4 pt-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] font-ui flex items-center gap-2">
                <Target size={12} className="text-blue-500" /> Sector Matrix
@@ -419,7 +461,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                  <div className={`p-8 flex flex-col flex-1 ${viewMode === 'list' ? 'justify-between' : ''}`}>
                     <div className="flex items-center justify-between mb-5">
                        <div className="flex items-center gap-3 cursor-pointer group/seller" onClick={() => onNavigateStore?.(item.seller_name || '')}>
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-transform group-hover/seller:scale-110 ${item.seller_type === 'enterprise' ? 'bg-blue-600 shadow-blue-500/20' : 'bg-amber-500 shadow-amber-500/20'}`}>
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-transform group-hover/seller:scale-110 ${item.seller_type === 'enterprise' ? 'bg-blue-600 shadow-blue-500/20' : 'bg-amber-50 shadow-amber-500/20'}`}>
                              {item.seller_type === 'enterprise' ? <Building2 size={18} /> : <User size={18} />}
                           </div>
                           <div className="min-w-0">
@@ -466,6 +508,17 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
            </div>
         </div>
       </div>
+
+      {/* Story Viewer Modal */}
+      {selectedStoryIndex !== null && (
+        <StoryPlayer 
+          stories={MOCK_STORIES} 
+          initialIndex={selectedStoryIndex} 
+          onClose={() => setSelectedStoryIndex(null)}
+          onNavigateStore={onNavigateStore || (() => {})}
+          currentUser={MOCK_PROFILES[0]}
+        />
+      )}
     </div>
   );
 };

@@ -24,8 +24,9 @@ const StoriesView: React.FC<StoriesViewProps> = ({ onBack, onNavigateStore }) =>
         </div>
         <div className="hidden lg:flex flex-col items-end">
            <div className="flex -space-x-4 mb-3">
+              {/* Fix: use user_avatar instead of avatar_url */}
               {MOCK_STORIES.slice(0, 5).map(s => (
-                <img key={s.id} src={s.avatar_url} className="w-12 h-12 rounded-full border-4 border-white shadow-lg object-cover" />
+                <img key={s.id} src={s.user_avatar} className="w-12 h-12 rounded-full border-4 border-white shadow-lg object-cover" />
               ))}
               <div className="w-12 h-12 rounded-full bg-slate-100 border-4 border-white flex items-center justify-center text-[10px] font-black text-slate-400 shadow-lg">
                 +24k
@@ -61,23 +62,25 @@ const StoriesView: React.FC<StoriesViewProps> = ({ onBack, onNavigateStore }) =>
             className="group bg-white rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col h-full overflow-hidden"
           >
             <div className="p-8 pb-4 flex items-center gap-5">
+              {/* Fix: use user_avatar instead of avatar_url, user_full_name instead of full_name */}
               <img 
-                src={story.avatar_url} 
+                src={story.user_avatar} 
                 className="w-14 h-14 rounded-2xl object-cover border-4 border-slate-50 shadow-md group-hover:rotate-6 transition-transform" 
-                alt={story.full_name} 
+                alt={story.user_full_name} 
               />
               <div className="min-w-0">
-                <h3 className="font-black text-slate-900 leading-tight truncate">{story.full_name}</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 truncate">{story.company}</p>
+                <h3 className="font-black text-slate-900 leading-tight truncate">{story.user_full_name}</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 truncate">Verified Enterprise Node</p>
               </div>
             </div>
 
             <div className="px-8 py-6 space-y-4 flex-1">
                <div className="flex items-center gap-3 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2">
-                  <Library size={12} /> Case Study • {story.date}
+                  <Library size={12} /> Case Study • {new Date(story.created_at).toLocaleDateString()}
                </div>
+               {/* Fix: use content_text instead of content */}
                <p className="text-slate-700 text-lg leading-relaxed font-medium line-clamp-4">
-                 "{story.content}"
+                 "{story.content_text}"
                </p>
             </div>
 
@@ -96,7 +99,7 @@ const StoriesView: React.FC<StoriesViewProps> = ({ onBack, onNavigateStore }) =>
                    <span className="flex items-center gap-1.5"><Star size={12}/> 4.9</span>
                 </div>
                 <button 
-                  onClick={() => onNavigateStore(story.full_name)}
+                  onClick={() => onNavigateStore(story.user_full_name || '')}
                   className="p-3 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-xl active:scale-90"
                 >
                   <ArrowRight size={20} />
