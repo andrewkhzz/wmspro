@@ -125,6 +125,7 @@ export interface Story {
   font_family?: string;
   animation_effect?: string;
   auto_scroll?: boolean;
+  scroll_speed?: number; // Added for fix
   duration_seconds: number;
   has_sound: boolean;
   allow_replies: boolean;
@@ -159,6 +160,10 @@ export interface Story {
   published_at?: string;
   user_full_name?: string;
   user_avatar?: string;
+  bg_effect?: 'none' | 'kenburns' | 'crt' | 'drift' | 'matrix' | 'rgbpulse';
+  show_grain?: boolean;
+  card_style?: string;
+  item_card_style?: string; // Added for predefined item cards
 }
 
 export interface StoryHighlight {

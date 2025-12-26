@@ -19,47 +19,76 @@ export const askInventoryAssistant = async (question: string): Promise<string> =
 
 export const enhanceStory = async (rawText: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Transform this raw technical warehouse feedback into a professional industrial story: "${rawText}"`,
-    config: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING },
-          content: { type: Type.STRING },
-          suggested_tags: { type: Type.ARRAY, items: { type: Type.STRING } }
-        },
-        required: ["title", "content", "suggested_tags"]
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `You are a corporate communications officer for a logistics company. 
+      Analyze this user input: "${rawText}". 
+      TASK: Rewrite into a professional industrial story headline and detailed narrative for a warehouse management grid.
+      
+      OUTPUT RULES:
+      1. title: max 40 chars, very punchy.
+      2. content: expanded professional narrative.
+      3. suggested_tags: 3-4 relevant industrial tags.
+      
+      RETURN ONLY RAW JSON.`,
+      config: { 
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            content: { type: Type.STRING },
+            suggested_tags: { type: Type.ARRAY, items: { type: Type.STRING } }
+          },
+          required: ["title", "content", "suggested_tags"]
+        }
       }
-    }
-  });
-  return JSON.parse(response.text || "{}");
+    });
+    
+    const text = response.text?.trim() || "{}";
+    // Attempt to extract JSON if model wraps it in markdown blocks
+    const jsonStr = text.startsWith('```') ? text.split('\n').slice(1, -1).join('\n') : text;
+    return JSON.parse(jsonStr);
+  } catch (err) {
+    console.error("Enhance Story Error:", err);
+    return {
+      title: "Log Entry Sync",
+      content: rawText,
+      suggested_tags: ["Logistics", "Grid"]
+    };
+  }
 };
 
 export const generateCreativeStoryStyle = async (rawText: string, itemName?: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Analyze this content: "${rawText}" and linked item: "${itemName || 'none'}". Create an ultimate high-impact creative package.`,
-    config: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING, description: "Punchy short headline" },
-          content_text: { type: Type.STRING, description: "Refined description" },
-          background_color: { type: Type.STRING, description: "HEX color" },
-          text_color: { type: Type.STRING, description: "HEX color contrast to background" },
-          font_family: { type: Type.STRING, description: "One of: Roboto, Montserrat, Inter, Open Sans" },
-          animation_effect: { type: Type.STRING, description: "One of: fade, slide, glow, zoom" }
-        },
-        required: ["title", "content_text", "background_color", "text_color", "font_family", "animation_effect"]
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Analyze this content: "${rawText}" and linked item: "${itemName || 'none'}". Create an ultimate high-impact creative package for a warehouse story. 
+      Return exactly a JSON object.`,
+      config: { 
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING, description: "Punchy short headline" },
+            content_text: { type: Type.STRING, description: "Refined description" },
+            background_color: { type: Type.STRING, description: "HEX color" },
+            text_color: { type: Type.STRING, description: "HEX color contrast to background" },
+            font_family: { type: Type.STRING, description: "One of: Montserrat, Orbitron, Rajdhani, Syncopate, majormono, michroma, pressstart" },
+            animation_effect: { type: Type.STRING, description: "One of: fade, slide, glow, zoom, glitch, hologram, neon, subtitle" }
+          },
+          required: ["title", "content_text", "background_color", "text_color", "font_family", "animation_effect"]
+        }
       }
-    }
-  });
-  return JSON.parse(response.text || "{}");
+    });
+    const text = response.text?.trim() || "{}";
+    const jsonStr = text.startsWith('```') ? text.split('\n').slice(1, -1).join('\n') : text;
+    return JSON.parse(jsonStr);
+  } catch {
+    return {};
+  }
 };
 
 export const generateStoryArt = async (content: string): Promise<string | null> => {
@@ -79,70 +108,76 @@ export const generateStoryArt = async (content: string): Promise<string | null> 
 
 export const suggestBinAllocation = async (itemType: string, warehouseCode: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Suggest storage zone for ${itemType} in warehouse ${warehouseCode}.`,
-    config: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          suggestedZoneCode: { type: Type.STRING },
-          reason: { type: Type.STRING }
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Suggest storage zone for ${itemType} in warehouse ${warehouseCode}.`,
+      config: { 
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            suggestedZoneCode: { type: Type.STRING },
+            reason: { type: Type.STRING }
+          }
         }
       }
-    }
-  });
-  return JSON.parse(response.text || "{}");
+    });
+    return JSON.parse(response.text || "{}");
+  } catch { return {}; }
 };
 
 export const autoIdentifyItem = async (base64Image: string, includeCharacteristics: boolean = true) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: {
-      parts: [
-        { inlineData: { mimeType: 'image/jpeg', data: base64Image } },
-        { text: `Identify this warehouse item.` }
-      ]
-    },
-    config: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING },
-          category_id: { type: Type.NUMBER },
-          suggested_price: { type: Type.NUMBER },
-          condition: { type: Type.STRING },
-          description: { type: Type.STRING },
-          suggested_sku: { type: Type.STRING }
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: {
+        parts: [
+          { inlineData: { mimeType: 'image/jpeg', data: base64Image } },
+          { text: `Identify this warehouse item. Return JSON.` }
+        ]
+      },
+      config: { 
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            category_id: { type: Type.NUMBER },
+            suggested_price: { type: Type.NUMBER },
+            condition: { type: Type.STRING },
+            description: { type: Type.STRING },
+            suggested_sku: { type: Type.STRING }
+          }
         }
       }
-    }
-  });
-  return JSON.parse(response.text || "{}");
+    });
+    return JSON.parse(response.text || "{}");
+  } catch { return {}; }
 };
 
 export const analyzeMovementRisk = async (itemName: string, fromZone: string, toZone: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Risk of moving ${itemName} from ${fromZone} to ${toZone}.`,
-    config: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          riskScore: { type: Type.NUMBER },
-          riskLevel: { type: Type.STRING },
-          reason: { type: Type.STRING },
-          suggestion: { type: Type.STRING }
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Risk of moving ${itemName} from ${fromZone} to ${toZone}.`,
+      config: { 
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            riskScore: { type: Type.NUMBER },
+            riskLevel: { type: Type.STRING },
+            reason: { type: Type.STRING },
+            suggestion: { type: Type.STRING }
+          }
         }
       }
-    }
-  });
-  return JSON.parse(response.text || "{}");
+    });
+    return JSON.parse(response.text || "{}");
+  } catch { return {}; }
 };
 
 export const suggestSmartReply = async (messageText: string, context: string): Promise<string[]> => {
@@ -165,11 +200,13 @@ export const suggestSmartReply = async (messageText: string, context: string): P
 
 export const generateReportInsight = async (reportType: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Strategic insight for ${reportType}.`,
-  });
-  return response.text || "Insight unavailable.";
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Strategic insight for ${reportType}.`,
+    });
+    return response.text || "Insight unavailable.";
+  } catch { return "Insight failure."; }
 };
 
 export const generateAiSku = async (title: string, category: string, characteristics: any[]): Promise<string> => {
