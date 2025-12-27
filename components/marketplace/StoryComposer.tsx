@@ -12,7 +12,6 @@ import {
   MonitorCheck, Crosshair, AlertTriangle, ShieldAlert, Building2,
   Radiation, Terminal as TerminalIcon, FlaskConical, Ghost, Skull,
   FileText, Megaphone, Newspaper, ShoppingCart, ZapOff, Ghost as GhostIcon,
-  // Fix: Added History icon import to avoid collision with global History interface
   History
 } from 'lucide-react';
 import { Story, Profile, StoryContentType, CTAActionType } from '../../lib/types';
@@ -110,7 +109,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
     show_grain: true,
     auto_scroll: false,
     scroll_speed: 15,
-    duration_seconds: 15,
+    duration_seconds: 43200,
     allow_replies: true,
     call_to_action_type: 'view_item',
     call_to_action_text: 'Procure Asset',
@@ -123,7 +122,6 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
 
   const selectedItem = MOCK_ITEMS.find(i => i.id === formData.linked_item_id);
 
-  // Auto-set headline and visual when item is linked
   useEffect(() => {
     if (selectedItem) {
       setFormData(prev => ({ 
@@ -356,7 +354,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
               </div>
            </div>
 
-           {/* Item Card Preset Matrix (The new 10 cards) */}
+           {/* Item Card Preset Matrix */}
            <div className="space-y-4">
               <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                 <ShoppingCart size={14} className="text-[#0052FF]" /> Asset Card Identity
@@ -472,12 +470,31 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
 
            {/* Publish Sector */}
            <div className="pt-4 border-t border-slate-50 flex flex-col gap-4">
+              <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 gap-1">
+                {[
+                  { label: '6hour', val: 21600 },
+                  { label: '12hour', val: 43200 },
+                  { label: '48hours', val: 172800 }
+                ].map(opt => (
+                  <button 
+                    key={opt.val}
+                    onClick={() => setFormData({...formData, duration_seconds: opt.val})}
+                    className={`flex-1 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      formData.duration_seconds === opt.val 
+                      ? 'bg-blue-600 text-white shadow-xl' 
+                      : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
               <button 
                 onClick={handleCommit}
                 className="w-full py-6 bg-slate-950 text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/10 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
               >
                  <Globe size={20} className="group-hover:rotate-12 transition-transform" />
-                 DEPLOY TO GLOBAL GRID
+                 Publish
               </button>
            </div>
         </div>
@@ -554,7 +571,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
                        </p>
                     </div>
 
-                    {/* DYNAMIC LINKED ITEM CARD (The 10 styles) */}
+                    {/* DYNAMIC LINKED ITEM CARD */}
                     {formData.linked_item_id && selectedItem && (
                        <div className={`mt-8 relative group/card animate-slide-up item-card-style-${formData.item_card_style}`}>
                           <div className="card-shadow-element"></div>
@@ -641,7 +658,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
       <style>{`
         @keyframes grain { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
         @keyframes progress { 0% { width: 0%; opacity: 1; } 95% { width: 100%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
-        @keyframes crawl-scroll { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
+        @keyframes crawl-scroll { 0% { transform: translateY(100%); } 100% { transform: translateY(-120%); } }
         @keyframes kenburns { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.3) translateY(-5%); } }
         @keyframes drift { 0% { transform: translate(-2%, -2%); } 50% { transform: translate(2%, 2%); } 100% { transform: translate(-2%, -2%); } }
         @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.95; } 80% { opacity: 0.98; } }
@@ -673,7 +690,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
         
         .animate-crawl-scroll {
           animation: crawl-scroll linear infinite;
-          padding-top: 100%;
+          padding-top: 120%;
         }
 
         .mask-gradient {
