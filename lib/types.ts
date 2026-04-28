@@ -125,7 +125,7 @@ export interface Story {
   font_family?: string;
   animation_effect?: string;
   auto_scroll?: boolean;
-  scroll_speed?: number; // Added for fix
+  scroll_speed?: number; 
   duration_seconds: number;
   has_sound: boolean;
   allow_replies: boolean;
@@ -163,7 +163,11 @@ export interface Story {
   bg_effect?: 'none' | 'kenburns' | 'crt' | 'drift' | 'matrix' | 'rgbpulse';
   show_grain?: boolean;
   card_style?: string;
-  item_card_style?: string; // Added for predefined item cards
+  item_card_style?: string;
+  user_block_style?: string; // New customization property
+  /* Added missing fields to fix property doesn't exist errors */
+  user_block_position?: string;
+  audio_preset?: string;
 }
 
 export interface StoryHighlight {

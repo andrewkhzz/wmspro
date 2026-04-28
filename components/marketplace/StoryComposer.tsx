@@ -12,7 +12,9 @@ import {
   MonitorCheck, Crosshair, AlertTriangle, ShieldAlert, Building2,
   Radiation, Terminal as TerminalIcon, FlaskConical, Ghost, Skull,
   FileText, Megaphone, Newspaper, ShoppingCart, ZapOff, Ghost as GhostIcon,
-  History
+  History, BadgeCheck, UserCircle, Hexagon, BoxSelect, Droplets, Contrast,
+  Square, Wind, Zap as ZapIcon, Cpu as CpuIcon, Waves, Scan as ScanIcon,
+  Mic, Eye as EyeIcon, Radio as RadarIcon, Share2
 } from 'lucide-react';
 import { Story, Profile, StoryContentType, CTAActionType } from '../../lib/types';
 import { MOCK_ITEMS } from '../../lib/constants';
@@ -36,6 +38,21 @@ const IDENTITY_PRESETS = [
   { id: 'classic', label: 'Legacy Sync', icon: <History size={14}/>, context: 'Archive Data', colors: { bg: '#334155', text: '#e2e8f0' }, font: 'pressstart', animation: 'typewriter', fx: 'crt' },
   { id: 'blueprint', label: 'Spec Draft', icon: <Layers size={14}/>, context: 'Technical Blueprint', colors: { bg: '#1e3a8a', text: '#ffffff' }, font: 'majormono', animation: 'reveal', fx: 'none' },
   { id: 'luxe', label: 'Premium S', icon: <Sparkles size={14}/>, context: 'High-Value Transit', colors: { bg: '#1c1917', text: '#fde047' }, font: 'Montserrat', animation: 'glow', fx: 'kenburns' },
+];
+
+const USER_BLOCK_STYLES = [
+  { id: 'standard', label: 'Glass', icon: <Droplets size={12}/> },
+  { id: 'glitch', label: 'Glitch', icon: <ZapIcon size={12}/> },
+  { id: 'phantom', label: 'Ghost', icon: <Ghost size={12}/> },
+  { id: 'scanner', label: 'Scan', icon: <ScanIcon size={12}/> },
+  { id: 'plasma', label: 'Liquid', icon: <Waves size={12}/> },
+  { id: 'radar', label: 'Ping', icon: <RadarIcon size={12}/> },
+  { id: 'aurora', label: 'Atmosphere', icon: <Wind size={12}/> },
+  { id: 'monochrome', label: 'Ink', icon: <Contrast size={12}/> },
+  { id: 'tactical', label: 'Tactic', icon: <Target size={12}/> },
+  { id: 'terminal', label: 'Code', icon: <TerminalIcon size={12}/> },
+  { id: 'prismatic', label: 'Prism', icon: <Sparkles size={12}/> },
+  { id: 'brutalist', label: 'Raw', icon: <Square size={12}/> }
 ];
 
 const ITEM_CARD_STYLES = [
@@ -117,7 +134,8 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
     tags: [],
     status: 'draft',
     card_style: 'nexus',
-    item_card_style: 'standard'
+    item_card_style: 'standard',
+    user_block_style: 'standard'
   });
 
   const selectedItem = MOCK_ITEMS.find(i => i.id === formData.linked_item_id);
@@ -188,6 +206,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
         linked_item_id: '',
         card_style: 'nexus',
         item_card_style: 'standard',
+        user_block_style: 'standard',
         auto_scroll: false
       });
     }
@@ -271,7 +290,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
             className="flex items-center gap-3 px-8 py-3 bg-slate-900 text-white rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:opacity-50 group"
           >
             {isStyleAiLoading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} className="text-yellow-400 group-hover:rotate-12 transition-transform" />}
-            Identity Alchemy AI
+            Alchemy AI
           </button>
         </div>
       </div>
@@ -280,7 +299,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
       <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-8 flex flex-col lg:flex-row gap-12 justify-center items-start pb-20">
         
         {/* --- LEFT: FORM SECTION --- */}
-        <div className="w-full lg:w-[540px] bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10 space-y-8 animate-scale-up">
+        <div className="w-full lg:w-[540px] bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 md:p-10 space-y-8 animate-scale-up h-auto overflow-visible">
            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <PlusCircle size={28} className="text-blue-600 fill-blue-50" />
@@ -324,10 +343,39 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
               </div>
            </div>
 
+           {/* HYPER COMPACT Identity Block Style Picker */}
+           <div className="space-y-3">
+              <div className="flex items-center justify-between ml-1">
+                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                   <UserCircle size={14} className="text-[#0052FF]" /> Identity Live HUD
+                 </label>
+                 <span className="text-[8px] font-black text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full uppercase">Neural v3</span>
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 px-1 -mx-1 snap-x">
+                 {USER_BLOCK_STYLES.map(style => (
+                   <button 
+                     key={style.id}
+                     onClick={() => setFormData({...formData, user_block_style: style.id})}
+                     className={`flex flex-col items-center gap-1.5 shrink-0 px-2.5 py-3 rounded-xl border transition-all snap-start min-w-[54px] ${
+                       formData.user_block_style === style.id 
+                       ? 'bg-blue-600 border-blue-500 text-white shadow-xl shadow-blue-500/20 scale-110 z-10' 
+                       : 'bg-white border-slate-100 text-slate-400 hover:border-blue-200 hover:bg-slate-50'
+                     }`}
+                     title={style.label}
+                   >
+                     <div className={`transition-all ${formData.user_block_style === style.id ? 'text-white' : 'text-slate-400'}`}>
+                        {style.icon}
+                     </div>
+                     <span className="text-[7px] font-black uppercase tracking-tighter text-center">{style.label}</span>
+                   </button>
+                 ))}
+              </div>
+           </div>
+
            {/* Identity Presets Matrix */}
            <div className="space-y-4">
               <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-                <Palette size={14} className="text-blue-500" /> Identity Preset Matrix
+                <Palette size={14} className="text-blue-500" /> Color Preset Matrix
               </label>
               <div className="grid grid-cols-5 gap-3">
                  {IDENTITY_PRESETS.map(style => (
@@ -532,15 +580,30 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
                  
                  <div className="absolute inset-0 border-[30px] border-transparent shadow-[inset_0_0_100px_rgba(0,0,0,0.6)] pointer-events-none z-10"></div>
 
-                 {/* Profile Overlay */}
-                 <div className="absolute top-12 left-0 w-full px-8 flex items-center gap-3 z-40">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl ring-4 ring-blue-500/10">
-                       <img src={currentUser.avatar_url} className="w-full h-full object-cover" />
+                 {/* Profile Identity Block (REFACTORED LIVE VERSIONS) */}
+                 <div className={`user-block-container user-block-style-${formData.user_block_style}`}>
+                    <div className="user-block-background"></div>
+                    <div className="user-block-inner">
+                       <div className="user-block-avatar-frame">
+                          <img src={currentUser.avatar_url} className="user-block-avatar" />
+                          <div className="user-block-avatar-ring"></div>
+                          <div className="user-block-live-fx"></div>
+                       </div>
+                       <div className="user-block-info">
+                          <div className="user-block-title-row">
+                             <p className="user-block-name">{currentUser.full_name}</p>
+                             <div className="user-block-verification">
+                                <BadgeCheck size={10} strokeWidth={3} />
+                             </div>
+                          </div>
+                          <div className="user-block-subtitle-container">
+                             <p className="user-block-subtitle">Authorized operator</p>
+                             <div className="user-block-pulse-dot"></div>
+                          </div>
+                       </div>
                     </div>
-                    <div>
-                       <p className="text-[12px] font-black text-white leading-none tracking-tight">{currentUser.full_name}</p>
-                       <p className="text-[8px] font-bold text-blue-400 uppercase tracking-widest mt-1">Authorized Operator</p>
-                    </div>
+                    <div className="user-block-accent"></div>
+                    <div className="user-block-scanline"></div>
                  </div>
 
                  {/* Foreground Content */}
@@ -657,7 +720,6 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
 
       <style>{`
         @keyframes grain { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
-        @keyframes progress { 0% { width: 0%; opacity: 1; } 95% { width: 100%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
         @keyframes crawl-scroll { 0% { transform: translateY(100%); } 100% { transform: translateY(-120%); } }
         @keyframes kenburns { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.3) translateY(-5%); } }
         @keyframes drift { 0% { transform: translate(-2%, -2%); } 50% { transform: translate(2%, 2%); } 100% { transform: translate(-2%, -2%); } }
@@ -665,40 +727,97 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
         @keyframes holo-glow { 0% { filter: drop-shadow(0 0 5px cyan); transform: translateX(0); } 50% { filter: drop-shadow(0 0 15px cyan); transform: translateX(1px); } 100% { filter: drop-shadow(0 0 5px cyan); transform: translateX(0); } }
         @keyframes neon-pulse { 0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0052FF; } 50% { text-shadow: 0 0 2px #fff, 0 0 5px #fff, 0 0 10px #0052FF; } }
         @keyframes scan-line { 0% { top: 0%; } 100% { top: 100%; } }
-        @keyframes track-wide { from { letter-spacing: -0.1em; opacity: 0; } to { letter-spacing: 0.5em; opacity: 1; } }
         @keyframes matrix-scroll { from { background-position: 0 0; } to { background-position: 0 1000px; } }
         @keyframes rgb-pulse { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-        @keyframes card-vibrate { 0%, 100% { transform: translate(0); } 20% { transform: translate(-1px, 1px); } 40% { transform: translate(-1px, -1px); } 60% { transform: translate(1px, 1px); } 80% { transform: translate(1px, -1px); } }
+        @keyframes edge-glow { 0%, 100% { border-color: rgba(255,255,255,0.1); } 50% { border-color: rgba(0,82,255,1); } }
+        @keyframes prism { 0% { border-image-source: linear-gradient(0deg, #ff0055, #0052FF, #00ffff); } 100% { border-image-source: linear-gradient(360deg, #ff0055, #0052FF, #00ffff); } }
+        @keyframes glitch-anim { 0% { clip-path: inset(80% 0 0 0); transform: translate(-5px, -3px); } 10% { clip-path: inset(10% 0 85% 0); transform: translate(5px, 3px); } 20% { clip-path: inset(80% 0 0 0); transform: translate(-5px, -3px); } 100% { clip-path: inset(80% 0 0 0); transform: translate(-5px, -3px); } }
+        @keyframes radar-pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
 
         .bg-img-kenburns { animation: kenburns 30s ease-in-out infinite alternate; }
         .bg-img-drift { animation: drift 20s linear infinite; }
         .bg-effect-crt { animation: flicker 0.15s infinite; filter: contrast(1.1) brightness(1.2) sepia(0.2); }
         .crt-lines { background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03)); background-size: 100% 3px, 3px 100%; }
-        
-        .matrix-effect {
-          background-image: linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
-          background-size: 20px 20px;
-          animation: matrix-scroll 20s linear infinite;
-        }
+        .matrix-effect { background-image: linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px); background-size: 20px 20px; animation: matrix-scroll 20s linear infinite; }
         .bg-effect-rgbpulse { animation: rgb-pulse 10s linear infinite; }
 
         .fx-text-hologram { animation: holo-glow 2s infinite ease-in-out; }
         .fx-text-neon { animation: neon-pulse 1.5s infinite; }
-        .fx-text-subtitle { animation: track-wide 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animation-glitch { animation: card-vibrate 0.3s infinite linear alternate-reverse; }
-        
-        .animate-crawl-scroll {
-          animation: crawl-scroll linear infinite;
-          padding-top: 120%;
-        }
+        .animation-glitch { animation: glitch-anim 0.2s infinite linear alternate-reverse; }
 
-        .mask-gradient {
-          mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
-          -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+        /* REFACTORED USER IDENTITY BLOCKS */
+        .user-block-container {
+          position: absolute;
+          top: 3rem;
+          left: 0;
+          width: 100%;
+          padding: 0 2rem;
+          z-index: 50;
+          display: flex;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        .user-block-inner { display: flex; align-items: center; gap: 0.75rem; position: relative; z-index: 10; }
+        .user-block-avatar-frame { position: relative; width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; flex-shrink: 0; z-index: 20; }
+        .user-block-avatar { width: 100%; height: 100%; object-fit: cover; }
+        .user-block-name { font-size: 12px; font-weight: 900; color: white; letter-spacing: -0.025em; line-height: 1; }
+        .user-block-subtitle { font-size: 8px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+        .user-block-verification { color: #3b82f6; }
+        .user-block-title-row { display: flex; align-items: center; gap: 0.25rem; }
+        .user-block-subtitle-container { display: flex; align-items: center; gap: 0.5rem; }
+        .user-block-pulse-dot { width: 4px; height: 4px; background: #10b981; border-radius: 9999px; animation: pulse 2s infinite; }
 
-        /* Thumbnails for Card Styles */
+        /* Style: Standard Glass */
+        .user-block-style-standard .user-block-background { position: absolute; inset: -0.5rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; }
+        .user-block-style-standard .user-block-inner { padding: 0.25rem; }
+
+        /* Style: Glitch (LIVE) */
+        .user-block-style-glitch .user-block-avatar-frame { animation: glitch-anim 0.5s infinite; filter: hue-rotate(90deg); }
+        .user-block-style-glitch .user-block-name { text-shadow: 2px 0 #ff0055, -2px 0 #00ffff; }
+
+        /* Style: Scanner (LIVE) */
+        .user-block-style-scanner .user-block-scanline { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ff0000; box-shadow: 0 0 15px #ff0000; animation: scan-line 2s linear infinite; z-index: 30; }
+        .user-block-style-scanner .user-block-avatar-frame { border: 1px solid rgba(255,0,0,0.3); }
+
+        /* Style: Phantom (LIVE) */
+        .user-block-style-phantom .user-block-background { position: absolute; inset: 0; border: 1px solid rgba(255,255,255,0.2); border-radius: 1rem; animation: edge-glow 4s infinite; }
+        .user-block-style-phantom .user-block-avatar-frame { opacity: 0.7; mix-blend-mode: overlay; }
+
+        /* Style: Plasma (LIVE) */
+        .user-block-style-plasma .user-block-background { position: absolute; inset: 0; background: linear-gradient(135deg, #0052FF, #ff0055, #00ffff); background-size: 400% 400%; animation: rgb-pulse 10s infinite; border-radius: 3rem; opacity: 0.2; }
+        .user-block-style-plasma .user-block-avatar-frame { ring: 2px solid #00ffff; ring-offset: 2px; ring-offset-color: transparent; }
+
+        /* Style: Radar (LIVE) */
+        .user-block-style-radar .user-block-live-fx::after { content: ''; position: absolute; inset: 0; border: 2px solid #3b82f6; border-radius: 9999px; animation: radar-pulse 2s infinite; pointer-events: none; }
+        .user-block-style-radar .user-block-avatar-frame { border: 2px solid #3b82f6; }
+
+        /* Style: Aurora (LIVE) */
+        .user-block-style-aurora .user-block-background { position: absolute; inset: -2rem; background: radial-gradient(circle at center, rgba(0,255,150,0.1), transparent 70%); animation: drift 10s infinite; }
+        .user-block-style-aurora .user-block-name { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; }
+
+        /* Style: Monochrome */
+        .user-block-style-monochrome .user-block-inner { background: white; padding: 0.75rem 1.5rem; border-radius: 0; }
+        .user-block-style-monochrome .user-block-name { color: black; font-weight: 900; }
+        .user-block-style-monochrome .user-block-avatar-frame { filter: grayscale(1) contrast(1.5); border-radius: 0; border: 2px solid black; }
+
+        /* Style: Tactical */
+        .user-block-style-tactical .user-block-inner { background: #1a1a1a; padding: 0.75rem; border-left: 4px solid #fbbf24; clip-path: polygon(0 0, 100% 0, 100% 80%, 90% 100%, 0 100%); }
+        .user-block-style-tactical .user-block-name { font-family: 'Rajdhani', sans-serif; color: #fbbf24; text-transform: uppercase; }
+
+        /* Style: Terminal */
+        .user-block-style-terminal .user-block-inner { background: #000; border: 1px solid #4ade80; padding: 0.5rem; }
+        .user-block-style-terminal .user-block-name { font-family: 'Press Start 2P', cursive; font-size: 8px; color: #4ade80; }
+        .user-block-style-terminal .user-block-avatar-frame { border-radius: 0; filter: grayscale(1) sepia(1) hue-rotate(90deg); }
+
+        /* Style: Prismatic */
+        .user-block-style-prismatic .user-block-background { position: absolute; inset: 0; border: 3px solid; border-image-slice: 1; border-image-source: linear-gradient(45deg, #ff0055, #0052FF, #00ffff); animation: prism 3s linear infinite; }
+        .user-block-style-prismatic .user-block-inner { padding: 0.5rem; }
+
+        /* Style: Brutalist */
+        .user-block-style-brutalist { top: 0; padding: 0; }
+        .user-block-style-brutalist .user-block-inner { background: #000; border-bottom: 8px solid #fff; border-right: 8px solid #fff; padding: 1.5rem; width: 100%; }
+        .user-block-style-brutalist .user-block-name { font-size: 18px; font-family: 'Syncopate', sans-serif; }
+
+        /* Card Thumbnails for Card Styles */
         .card-thumb-standard { background: #3b82f6; border: 1px solid #ffffff44; }
         .card-thumb-cyber { background: #000; border: 2px solid #00ffff; box-shadow: 0 0 5px #00ffff88; }
         .card-thumb-hazard { background: #fbbf24; background-image: repeating-linear-gradient(45deg, #000 0, #000 5px, transparent 5px, transparent 10px); }
@@ -710,82 +829,33 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ currentUser, onBack, onSa
         .card-thumb-flash { background: #fff; box-shadow: 0 0 10px #3b82f6; }
         .card-thumb-deep { background: #0f172a; box-shadow: inset 0 0 10px #000; }
 
-        /* ITEM CARD ENGINE (10 Styles) */
-        .card-main-container {
-          position: relative;
-          background: rgba(0,0,0,0.7);
-          backdrop-filter: blur(24px);
-          border-radius: 2.25rem;
-          border: 1px solid rgba(255,255,255,0.2);
-          padding: 1.25rem;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-          overflow: hidden;
-          transition: all 0.5s;
-        }
+        /* ITEM CARD ENGINE */
+        .card-main-container { position: relative; background: rgba(0,0,0,0.7); backdrop-filter: blur(24px); border-radius: 2.25rem; border: 1px solid rgba(255,255,255,0.2); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; }
         .card-shadow-element { position: absolute; inset: -0.25rem; border-radius: 2.5rem; blur: 10px; opacity: 0.5; transition: opacity 0.7s; }
         .card-scan-line { position: absolute; inset: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.05); top: 50%; pointer-events: none; animation: scan-line 4s linear infinite; }
         .card-visual-wrapper { width: 4rem; height: 4rem; background: #1e293b; border-radius: 1rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
         .card-badge-row { display: flex; align-items: center; gap: 0.375rem; margin-bottom: 0.375rem; }
-        .card-pulse-dot { width: 0.375rem; height: 0.375rem; border-radius: 9999px; background: #22d3ee; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .card-pulse-dot { width: 0.375rem; height: 0.375rem; border-radius: 9999px; background: #22d3ee; animation: pulse 2s infinite; }
         .card-badge-text { font-size: 9px; font-weight: 900; color: #22d3ee; text-transform: uppercase; letter-spacing: 0.2em; }
-        .card-title { font-size: 11px; font-weight: 900; color: #fff; line-height: 1.2; text-transform: uppercase; letter-spacing: -0.025em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+        .card-title { font-size: 11px; font-weight: 900; color: #fff; line-height: 1.2; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
         .card-price-row { display: flex; align-items: baseline; gap: 0.25rem; margin-top: 0.375rem; }
         .card-price-value { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -0.05em; }
         .card-price-currency { font-size: 8px; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
-        .card-action-button { padding: 0.875rem; background: linear-gradient(to bottom right, #2563eb, #4338ca); color: #fff; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3); transition: transform 0.2s; }
+        .card-action-button { padding: 0.875rem; background: linear-gradient(to bottom right, #2563eb, #4338ca); color: #fff; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3); }
 
-        /* V1 Standard */
         .item-card-style-standard .card-shadow-element { background: linear-gradient(to right, #2563eb, #6366f1, #06b6d4); }
-        
-        /* V2 Cyber */
-        .item-card-style-cyber .card-main-container { border: 2px solid #00ffff; box-shadow: 0 0 20px rgba(0,255,255,0.2); background: rgba(0,0,0,0.9); }
-        .item-card-style-cyber .card-pulse-dot { background: #ff0055; box-shadow: 0 0 10px #ff0055; }
-        .item-card-style-cyber .card-badge-text { color: #ff0055; }
+        .item-card-style-cyber .card-main-container { border: 2px solid #00ffff; background: rgba(0,0,0,0.9); }
         .item-card-style-cyber .card-action-button { background: #00ffff; color: #000; }
-
-        /* V3 Hazard */
         .item-card-style-hazard .card-main-container { border-top: 6px solid #fbbf24; border-radius: 1rem; background: #111; }
-        .item-card-style-hazard .card-main-container::before { content: ''; position: absolute; top: -6px; left: 0; width: 100%; height: 6px; background-image: repeating-linear-gradient(45deg, #000 0, #000 10px, transparent 10px, transparent 20px); }
-        .item-card-style-hazard .card-action-button { background: #fbbf24; color: #000; border-radius: 0.5rem; }
-
-        /* V4 Blueprint */
         .item-card-style-blueprint .card-main-container { background: #1e3a8a; border: 1px dashed rgba(255,255,255,0.5); }
-        .item-card-style-blueprint .card-scan-line { background: rgba(255,255,255,0.1); }
-        .item-card-style-blueprint .card-title, .item-card-style-blueprint .card-price-value { font-family: 'Major Mono Display', monospace; }
-
-        /* V5 Luxury */
         .item-card-style-luxury .card-main-container { border: 1px solid #fde047; background: linear-gradient(to bottom, #1c1917, #000); border-radius: 0; }
-        .item-card-style-luxury .card-shadow-element { background: #fde047; blur: 20px; opacity: 0.2; }
-        .item-card-style-luxury .card-action-button { background: #fde047; color: #000; border-radius: 0; }
-
-        /* V6 Minimal Glass */
-        .item-card-style-minimal .card-main-container { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(40px); box-shadow: 0 8px 32px 0 rgba(31,38,135,0.1); }
-        .item-card-style-minimal .card-title, .item-card-style-minimal .card-price-value { color: #fff; }
-        .item-card-style-minimal .card-action-button { background: #fff; color: #000; }
-
-        /* V7 Terminal */
+        .item-card-style-minimal .card-main-container { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(40px); }
         .item-card-style-terminal .card-main-container { background: #050505; border: 1px solid #4ade80; border-radius: 0.5rem; }
         .item-card-style-terminal .card-title, .item-card-style-terminal .card-price-value, .item-card-style-terminal .card-badge-text { color: #4ade80; font-family: 'Press Start 2P', cursive; font-size: 8px; }
-        .item-card-style-terminal .card-action-button { background: #4ade80; color: #000; border-radius: 0.25rem; }
-
-        /* V8 Liquid */
         .item-card-style-liquid .card-main-container { background: linear-gradient(135deg, rgba(255,0,85,0.2), rgba(0,82,255,0.2)); border: none; }
-        .item-card-style-liquid .card-shadow-element { background: linear-gradient(135deg, #ff0055, #0052FF); opacity: 0.4; }
-        .item-card-style-liquid .card-action-button { background: transparent; border: 2px solid #fff; }
-
-        /* V9 Flash */
         .item-card-style-flash .card-main-container { background: #fff; }
         .item-card-style-flash .card-title, .item-card-style-flash .card-price-value, .item-card-style-flash .card-badge-text { color: #000; }
-        .item-card-style-flash .card-action-button { background: #000; }
-        .item-card-style-flash { animation: card-vibrate 2s infinite ease-in-out; }
-
-        /* V10 Deep */
         .item-card-style-deep .card-main-container { background: #000; box-shadow: inset 0 0 40px rgba(255,255,255,0.1); border: 1px solid #222; }
-        .item-card-style-deep .card-visual-wrapper { border-color: #333; }
-        .item-card-style-deep .card-action-button { background: #111; border: 1px solid #333; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
